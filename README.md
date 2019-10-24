@@ -21,8 +21,8 @@ Aprendizaje supervisado y no supervisado. Modelos simples y ensambles de modelos
 # Clase 1. 
 - [Explicación y práctica - Notebook](/clase_1/notebook/intro_caret_notebook.nb.html)
 - [Explicación y práctica - RCode](/clase_1/scripts/intro_caret_script.R)
-- [Slides Intro ML - pdf](/clase_1/slides/Clase1a)
-- [Slides Over-Under fitting - pdf](/clase_1/slides/Clase1b)
+- [Slides Intro ML - pdf](/clase_1/slides/Clase1a.pdf)
+- [Slides Over-Under fitting - pdf](/clase_1/slides/Clase1b.pdf)
 
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
