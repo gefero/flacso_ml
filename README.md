@@ -16,14 +16,15 @@ Aprendizaje supervisado y no supervisado. Modelos simples y ensambles de modelos
 
 - __Unidad 3.__ Unidad Consideraciones para el diseño de modelos de aprendizaje automático con datos espaciales
 
-Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
-
 
 
 # Clase 1. 
 - [Explicación y práctica - Notebook](/clase_1/notebook/intro_caret_notebook.nb.html)
 - [Explicación y práctica - RCode](/clase_1/scripts/intro_caret_script.R)
-- [Slides - pdf](/clase_1/slides/)
+- [Slides Intro ML - pdf](/clase_1/slides/Clase1a)
+- [Slides Over-Under fitting - pdf](/clase_1/slides/Clase1b)
+
+Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
 - [![](img/Download.png)](clase_1.zip)
 
