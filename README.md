@@ -41,3 +41,10 @@ Pueden instalarse utilizando las instrucciones:
 install.packages('tidyverse')  
 install.packages('caret') 
 ```
+
+
+# Bibliografía y sitios de consulta
+
+- [James, G., Witten, D., Hastie, T. y Tibshirani, R. (2015), _Introduction to Statistical Learning_, Berlin: Springer.](http://faculty.marshall.usc.edu/gareth-james/ISL/)
+
+- [Kuhn, M. (s/f), _The `caret` package](http://topepo.github.io/caret/index.html)

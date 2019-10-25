@@ -358,6 +358,12 @@ ggplot(preds) +
         geom_density(aes(x=value, fill=model), alpha=0.5)
 ```
 
+```{r}
+ggplot(preds) +
+        geom_histogram(aes(x=value, fill=model), alpha=0.5,
+                       bins=50)
+```
+
 
 ### Práctica independiente: entrenando un árbol para predecir la no respuesta en ingresos
 
