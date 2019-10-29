@@ -168,7 +168,7 @@ Podemos usar la función `createFolds()` para generar los índices. Aquí, pas
 
 ```{r}
 cv_index <- createFolds(y = train$imp_inglab1,
-                        k=3,
+                        k=5,
                         list=TRUE,
                         returnTrain=TRUE)
 ```
@@ -179,7 +179,7 @@ Finalmente, especificamos el diseño de remuestreo mediante la función `trainCo
 fitControl <- trainControl(
         index=cv_index,
         method="cv",
-        number=3
+        number=5
         )
 ```
 
@@ -205,21 +205,21 @@ cart_tune
 
 ## Seleccionando el mejor modelo
 
-Una vez finalizado el proceso de tunning de los hiperparámetros, podemos proceder a elegir cuál es el mejor modelo y entrenarlo sobre todo el dataset:
+Una vez finalizado el proceso de tunning de los hiperparámetros, podemos proceder a elegir cuál es el mejor modelo y entrenarlo sobre todo el dataset. Podemos ver que el mejor es un árbol que parece demasiado complejo `maxdepth=15`, por ello, vamos a elegir uno un poco más interpreable
 
 ```{r}
 cart_final <- train(imp_inglab1 ~ . , 
                  data = train, 
                  method = "rpart2", 
                  trControl = fitControl,
-                 tuneGrid = cart_tune$bestTune,
+                 tuneGrid = data.frame(maxdepth=6),
                  control = rpart.control(cp=0.000001)
 )
 ```
 
 Podemos visualizarlo:
 
-```{r}
+```{r fig.height=12, fig.width=20}
 rpart.plot(cart_final$finalModel)
 ```
 
