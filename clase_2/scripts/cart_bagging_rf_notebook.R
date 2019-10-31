@@ -1,4 +1,4 @@
-## ------------------------------------------------------------------------
+## ---- message=FALSE------------------------------------------------------
 library(caret)
 library(tidyverse)
 library(rpart)
@@ -38,6 +38,7 @@ df_train <- data %>%
 
 
 ## ------------------------------------------------------------------------
+set.seed(1234)
 tr_index <- createDataPartition(y=df_train$imp_inglab1,
                                 p=0.8,
                                 list=FALSE)
@@ -105,7 +106,7 @@ set.seed(789)
 
 ## ------------------------------------------------------------------------
 cv_index <- createFolds(y = train$imp_inglab1,
-                        k=3,
+                        k=5,
                         list=TRUE,
                         returnTrain=TRUE)
 
@@ -114,7 +115,7 @@ cv_index <- createFolds(y = train$imp_inglab1,
 fitControl <- trainControl(
         index=cv_index,
         method="cv",
-        number=3
+        number=5
         )
 
 
@@ -138,13 +139,12 @@ cart_tune
 cart_final <- train(imp_inglab1 ~ . , 
                  data = train, 
                  method = "rpart2", 
-                 trControl = fitControl,
-                 tuneGrid = cart_tune$bestTune,
+                 tuneGrid = data.frame(maxdepth=6),
                  control = rpart.control(cp=0.000001)
 )
 
 
-## ------------------------------------------------------------------------
+## ----fig.height=12, fig.width=20-----------------------------------------
 rpart.plot(cart_final$finalModel)
 
 
@@ -154,4 +154,64 @@ y_preds <- predict(cart_final, test)
 
 ## ------------------------------------------------------------------------
 confusionMatrix(y_preds, test$imp_inglab1)
+
+
+## ------------------------------------------------------------------------
+set.seed(5699)
+
+cv_index_rf <- createFolds(y=train$imp_inglab1,
+                        k=5,
+                        list=TRUE,
+                        returnTrain=TRUE)
+
+fitControlrf <- trainControl(
+        index=cv_index,
+        method="cv",
+        number=5
+        )
+
+
+## ------------------------------------------------------------------------
+grid_rf <- expand.grid(mtry=c(5,10,25),
+                       min.node.size=c(5,20),
+                       splitrule='gini'
+        )
+
+
+## ------------------------------------------------------------------------
+t0 <- proc.time()
+rf_tune <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf,
+                 tuneGrid = grid_rf,
+                 metric='Accuracy'
+)
+
+proc.time() -  t0
+
+
+## ----eval=FALSE, include=FALSE-------------------------------------------
+## #saveRDS(rf_tune, '../models/rf_tune.RDS')
+
+
+## ------------------------------------------------------------------------
+rf_final <- train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 tuneGrid = rf_tune$bestTune,
+                 metric='Accuracy'
+)
+
+
+## ------------------------------------------------------------------------
+y_preds_rf <- predict(rf_final, test)
+
+confusionMatrix(y_preds_rf, test$imp_inglab1)
+
+
+
+## ----eval=FALSE, include=FALSE-------------------------------------------
+## 
+## #saveRDS(rf_final, '../models/rf_final.RDS')
 

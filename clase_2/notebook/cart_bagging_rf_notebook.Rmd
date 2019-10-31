@@ -19,7 +19,7 @@ Ya hemos preprocesado los datos y estamos listos
 Lo primero que tenemos que hacer es importar las librerías con las que vamos a trabajar:
 
 
-```{r}
+```{r, message=FALSE}
 library(caret)
 library(tidyverse)
 library(rpart)
@@ -67,6 +67,7 @@ df_train <- data %>%
 Lo primero que vamos a hacer es crear una partición de datos:
 
 ```{r}
+set.seed(1234)
 tr_index <- createDataPartition(y=df_train$imp_inglab1,
                                 p=0.8,
                                 list=FALSE)
@@ -211,7 +212,6 @@ Una vez finalizado el proceso de tunning de los hiperparámetros, podemos proced
 cart_final <- train(imp_inglab1 ~ . , 
                  data = train, 
                  method = "rpart2", 
-                 trControl = fitControl,
                  tuneGrid = data.frame(maxdepth=6),
                  control = rpart.control(cp=0.000001)
 )
@@ -236,4 +236,86 @@ Generamos nuestra matriz de confusión:
 confusionMatrix(y_preds, test$imp_inglab1)
 ```
 
+¿Qué se puede decir del árbol de decisión? ¿Cómo funciona?
 
+
+## Random Forest
+
+La idea ahora es poder entrenar un modelo random forest. Pero... lo van a hacer ustedes. Para ello, deberán consultar [la documentación de caret](http://topepo.github.io/caret/available-models.html) y buscar cuál es la mejor función para entrenar el modelo y sus hiperparámetros.
+
+Pista: buscar el método `ranger`
+
+Usaremos la partición original entre Train-Test. Recordemos los pasos a seguir
+
+
+1. Generar el esquema de validación cruzada
+2. Generar el grid de hiperparámetros
+3. Tunear el modelo
+4. Seleccionar y estimar el modelo final
+5. Validar y evaluar contra test-set
+
+
+```{r}
+
+```
+
+
+```{r echo=FALSE}
+
+# Generar el esquema de validación cruzada
+
+set.seed(5699)
+cv_index_rf <- createFolds(y=train$imp_inglab1,
+                        k=5,
+                        list=TRUE,
+                        returnTrain=TRUE)
+
+fitControlrf <- trainControl(
+        index=cv_index,
+        method="cv",
+        number=5
+        )
+
+# Generar grid
+
+grid_rf <- expand.grid(mtry=c(5,10,25),
+                       min.node.size=c(5,20),
+                       splitrule='gini'
+        )
+
+# Tunear
+
+t0 <- proc.time()
+rf_tune <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf,
+                 tuneGrid = grid_rf,
+                 metric='Accuracy'
+)
+
+proc.time() -  t0
+saveRDS(rf_tune, '../models/rf_tune.RDS')
+
+
+# Modelo final
+
+rf_final <- train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 tuneGrid = rf_tune$bestTune,
+                 metric='Accuracy')
+        
+# Validar
+
+y_preds_rf <- predict(rf_final, test)
+
+confusionMatrix(y_preds_rf, test$imp_inglab1)
+
+saveRDS(rf_final, '../models/rf_final.RDS')
+```
+
+
+- ¿Qué pueden decir de este modelo? 
+- ¿Funciona mejor que un árbol individual? 
+- ¿Qué sucede con su performance entre los `miss`
