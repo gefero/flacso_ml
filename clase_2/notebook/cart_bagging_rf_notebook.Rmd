@@ -313,6 +313,7 @@ y_preds_rf <- predict(rf_final, test)
 confusionMatrix(y_preds_rf, test$imp_inglab1)
 
 saveRDS(rf_final, '../models/rf_final.RDS')
+
 ```
 
 
