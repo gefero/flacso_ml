@@ -158,60 +158,183 @@ confusionMatrix(y_preds, test$imp_inglab1)
 
 ## ------------------------------------------------------------------------
 set.seed(5699)
-
 cv_index_rf <- createFolds(y=train$imp_inglab1,
                         k=5,
                         list=TRUE,
                         returnTrain=TRUE)
 
 fitControlrf <- trainControl(
-        index=cv_index,
+        index=cv_index_rf,
         method="cv",
-        number=5
+        number=5,
+        summaryFunction = twoClassSummary,
+        classProbs=TRUE
         )
 
+# Generar grid
 
-## ------------------------------------------------------------------------
-grid_rf <- expand.grid(mtry=c(5,10,25),
-                       min.node.size=c(5,20),
+grid_rf <- expand.grid(mtry=c(5,10,15, 25),
+                       min.node.size=c(5,10,15,20),
                        splitrule='gini'
         )
 
 
+
+## ----eval=FALSE, include=TRUE--------------------------------------------
+## # Tunear
+## t0 <- proc.time()
+## rf_fit_orig <-  train(imp_inglab1 ~ . ,
+##                  data = train,
+##                  method = "ranger",
+##                  trControl = fitControlrf,
+##                  tuneGrid = grid_rf
+## )
+## proc.time() -  t0
+## 
+## #saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
+
+
+## ----include=FALSE-------------------------------------------------------
+rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
+
+
+## ------------------------------------------------------------------------
+rf_fit_orig
+
+y_preds_orig <- predict(rf_fit_orig, test)
+
+
+## ------------------------------------------------------------------------
+ggplot(train) + 
+        geom_bar(aes(x=imp_inglab1))
+
+
+## ------------------------------------------------------------------------
+prop.table(table(y_preds_orig, test$imp_inglab1))
+
+
+## ------------------------------------------------------------------------
+model_weights <- ifelse(train$imp_inglab1 == "non_miss",
+                        (1/table(train$imp_inglab1)[1]) * 0.5,
+                        (1/table(train$imp_inglab1)[2]) * 0.5)
+
+fitControlrf$seeds <- rf_fit_orig$control$seeds
+
+
 ## ------------------------------------------------------------------------
 t0 <- proc.time()
-rf_tune <-  train(imp_inglab1 ~ . , 
+rf_fit_wei <-  train(imp_inglab1 ~ . , 
                  data = train, 
                  method = "ranger", 
                  trControl = fitControlrf,
                  tuneGrid = grid_rf,
-                 metric='Accuracy'
+                 weights = model_weights,
+                 metric='ROC'
 )
-
 proc.time() -  t0
 
-
-## ----eval=FALSE, include=FALSE-------------------------------------------
-## #saveRDS(rf_tune, '../models/rf_tune.RDS')
+#saveRDS(rf_fit_wei, '../models/rf_fit_wei.RDS')
 
 
-## ------------------------------------------------------------------------
-rf_final <- train(imp_inglab1 ~ . , 
-                 data = train, 
-                 method = "ranger", 
-                 tuneGrid = rf_tune$bestTune,
-                 metric='Accuracy'
-)
+
+## ----include=FALSE-------------------------------------------------------
+rf_fit_wei <- readRDS('../models/rf_fit_wei.RDS')
 
 
 ## ------------------------------------------------------------------------
-y_preds_rf <- predict(rf_final, test)
 
-confusionMatrix(y_preds_rf, test$imp_inglab1)
+# Nuevo fitControl con upsample
+
+fitControlrf_imb <- trainControl(
+        index=cv_index_rf,
+        method="cv",
+        number=5,
+        summaryFunction = twoClassSummary,
+        classProbs=TRUE,
+        sampling = 'up'
+        )
 
 
 
-## ----eval=FALSE, include=FALSE-------------------------------------------
+## ----eval=FALSE, include=TRUE--------------------------------------------
 ## 
-## #saveRDS(rf_final, '../models/rf_final.RDS')
+## # Tunear upsample
+## 
+## fitControlrf_imb$seeds <- rf_fit_orig$control$seeds
+## 
+## t0 <- proc.time()
+## rf_fit_up <-  train(imp_inglab1 ~ . ,
+##                  data = train,
+##                  method = "ranger",
+##                  trControl = fitControlrf_imb,
+##                  tuneGrid = grid_rf,
+##                  metric='ROC'
+## )
+## proc.time() -  t0
+## 
+## saveRDS(rf_fit_up, '../models/rf_fit_up.RDS')
+
+
+## ----include=FALSE-------------------------------------------------------
+rf_fit_up <- readRDS('../models/rf_fit_up')
+
+
+
+## ----eval=FALSE, include=TRUE--------------------------------------------
+## # Tunear downsample
+## 
+## fitControlrf_imb$sampling <- "down"
+## fitControlrf_imb$seeds <- rf_fit_orig$control$seeds
+## 
+## 
+## t0 <- proc.time()
+## rf_fit_down <-  train(imp_inglab1 ~ . ,
+##                  data = train,
+##                  method = "ranger",
+##                  trControl = fitControlrf_imb,
+##                  tuneGrid = grid_rf,
+##                  metric='ROC'
+## )
+## proc.time() -  t0
+## 
+## #saveRDS(rf_fit_down, '../models/rf_fit_down.RDS')
+## 
+
+
+## ----include=FALSE-------------------------------------------------------
+rf_fit_down <- readRDS('../models/rf_fit_down.RDS')
+
+
+## ----eval=FALSE, include=FALSE-------------------------------------------
+## rf_fit_smote <- readRDS('../models/rf_fit_smote.RDS')
+
+
+## ------------------------------------------------------------------------
+model_list <- list(original = rf_fit_orig,
+                   weighted = rf_fit_wei,
+                   down = rf_fit_down,
+                   up = rf_fit_up)
+
+
+
+## ------------------------------------------------------------------------
+extract_conf_metrics <- function(model, data, obs){
+        preds <- predict(model, data)        
+        c<-confusionMatrix(preds, obs)
+        results <- c(c$overall[1], c$byClass)
+        return(results)
+}
+
+
+
+## ------------------------------------------------------------------------
+
+model_metrics <- model_list %>%
+        map(extract_conf_metrics, data=test, obs = test$imp_inglab1) %>%
+        do.call(rbind,.)
+
+
+
+## ------------------------------------------------------------------------
+model_metrics
 

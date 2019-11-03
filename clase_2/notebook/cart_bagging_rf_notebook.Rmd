@@ -247,7 +247,6 @@ Pista: buscar el método `ranger`
 
 Usaremos la partición original entre Train-Test. Recordemos los pasos a seguir
 
-
 1. Generar el esquema de validación cruzada
 2. Generar el grid de hiperparámetros
 3. Tunear el modelo
@@ -256,14 +255,6 @@ Usaremos la partición original entre Train-Test. Recordemos los pasos a seguir
 
 
 ```{r}
-
-```
-
-
-```{r echo=FALSE}
-
-# Generar el esquema de validación cruzada
-
 set.seed(5699)
 cv_index_rf <- createFolds(y=train$imp_inglab1,
                         k=5,
@@ -271,52 +262,250 @@ cv_index_rf <- createFolds(y=train$imp_inglab1,
                         returnTrain=TRUE)
 
 fitControlrf <- trainControl(
-        index=cv_index,
+        index=cv_index_rf,
         method="cv",
-        number=5
+        number=5,
+        summaryFunction = twoClassSummary,
+        classProbs=TRUE
         )
 
 # Generar grid
 
-grid_rf <- expand.grid(mtry=c(5,10,25),
-                       min.node.size=c(5,20),
+grid_rf <- expand.grid(mtry=c(5,10,15, 25),
+                       min.node.size=c(5,10,15,20),
                        splitrule='gini'
         )
-
-# Tunear
-
-t0 <- proc.time()
-rf_tune <-  train(imp_inglab1 ~ . , 
-                 data = train, 
-                 method = "ranger", 
-                 trControl = fitControlrf,
-                 tuneGrid = grid_rf,
-                 metric='Accuracy'
-)
-
-proc.time() -  t0
-saveRDS(rf_tune, '../models/rf_tune.RDS')
-
-
-# Modelo final
-
-rf_final <- train(imp_inglab1 ~ . , 
-                 data = train, 
-                 method = "ranger", 
-                 tuneGrid = rf_tune$bestTune,
-                 metric='Accuracy')
-        
-# Validar
-
-y_preds_rf <- predict(rf_final, test)
-
-confusionMatrix(y_preds_rf, test$imp_inglab1)
-
-saveRDS(rf_final, '../models/rf_final.RDS')
 
 ```
 
 
+```{r eval=FALSE, include=TRUE}
+# Tunear
+t0 <- proc.time()
+rf_fit_orig <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf,
+                 tuneGrid = grid_rf
+)
+proc.time() -  t0
+
+#saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
+```
+
+```{r include=FALSE}
+rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
+```
+
+```{r}
+rf_fit_orig
+
+y_preds_orig <- predict(rf_fit_orig, test)
+```
+
 - ¿Qué pueden decir de este modelo? 
 - ¿Funciona mejor que un árbol individual? 
 - ¿Qué sucede con su performance entre los `miss`
+
+
+## Datasets desbalanceados... ¿qué hacer?
+
+Efectivamente, parte del problema de este dataset es que tenemos una variable dependiente sumamente desbalanceada:
+
+```{r}
+ggplot(train) + 
+        geom_bar(aes(x=imp_inglab1))
+```
+
+#### Matriz de confusión
+
+Ya estamos familiarizades con la matriz de confusión. Básicamente, es una forma rápida de comparar las predicciones del modelo con los valores reales. 
+
+```{r}
+prop.table(table(y_preds_orig, test$imp_inglab1))
+```
+
+Así, la métrica más simple es la siguiente:
+
+$Accuracy = \frac{TP + TN}{N} = \frac{TP + TN}{TP + TN + FP + FN}$
+
+Simplemente, calcula la proporción de casos bien clasificados ($TP + TN$) sobre el total. Pero esta métrica tiene algunos problemas. El más importante es que tiende a ser una medida engañosa de la performance de un modelo en un dataset desbalanceado.
+
+Un primer punto importante es poder seleccionar una métrica adecuada para evaluar nuestro modelo. Existen dos grandes familias de medidas:
+
+- Dependiente del umbral: Esto incluye métricas como precisión, recall y puntaje F1, que requieren una matriz de confusión para ser calculada usando un límite duro en las probabilidades pronosticadas. Estas métricas suelen ser bastante pobres en el caso de clases desequilibradas, ya que el software estadístico utiliza de manera inapropiada un umbral predeterminado de 0,50, lo que hace que el modelo prediga que todas las observaciones pertenecen a la clase mayoritaria.
+
+$Precision = \frac{TP}{TP+FP}$ Ratio entre verdaderos positivos y los que el modelo  clasifica como positivos. ¿Qué proporción de los que clasifcamos como positivos son efectivamente positivos?
+
+$Recall =  \frac{TP}{TP+FN}$ También llamada, $Sensitividad$, Ratio entre los positivos bien clasificados y el total de los que son positivos en realidad. ¿Qué proporción de los que efectivamente positivos hemos clasificado bien?
+
+$F1-Score = 2 \times \frac{Precision \times Recall}{Recall + Precision}$
+
+- Independiente del umbral: Esto incluye métricas como área bajo la curva ROC (AUC), que cuantifica la tasa positiva verdadera en función de la tasa de falsos positivos para una variedad de umbrales de clasificación. Otra forma de interpretar esta métrica es la probabilidad de que una instancia positiva aleatoria tenga una probabilidad estimada más alta que una instancia negativa aleatoria.
+
+
+#### ROC Curve o Área Under the Curve (AUC)
+
+
+
+
+En líneas generales, existen cuatro formas generales de lidiar con el problema de las clases desbalanceadas:
+
+- Usar modelos ponderados
+- _Down-sampling_ es decir, submuestrear las instancias sobrerrepresentadas
+- _Up-sampling_, es decir, sobremuestrar las instancias subrrepresentadas
+- _Synthetic minority sampling technique (SMOTE)_: hace _down-sampling_ de la clase mayoritaria y "sintetiza" nuevas instancias minoritarias mediante interpolación
+
+
+### Utilizar pesos en el modelo
+
+Para esto podemos utilizar el argumento `weights` en la función `train` -esto supone que el modelo seleccionado puede manejar pesos-...
+
+
+```{r}
+model_weights <- ifelse(train$imp_inglab1 == "non_miss",
+                        (1/table(train$imp_inglab1)[1]) * 0.5,
+                        (1/table(train$imp_inglab1)[2]) * 0.5)
+
+fitControlrf$seeds <- rf_fit_orig$control$seeds
+```
+
+
+Y entrenamos el modelo:
+
+```{r}
+t0 <- proc.time()
+rf_fit_wei <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf,
+                 tuneGrid = grid_rf,
+                 weights = model_weights,
+                 metric='ROC'
+)
+proc.time() -  t0
+
+#saveRDS(rf_fit_wei, '../models/rf_fit_wei.RDS')
+
+```
+
+```{r include=FALSE}
+rf_fit_wei <- readRDS('../models/rf_fit_wei.RDS')
+```
+
+
+### Métodos de remuestreo
+
+Probemos, ahora, métodos de remuestreo: _up sampling_, _down sampling_ y _SMOTE_.
+
+```{r}
+
+# Nuevo fitControl con upsample
+
+fitControlrf_imb <- trainControl(
+        index=cv_index_rf,
+        method="cv",
+        number=5,
+        summaryFunction = twoClassSummary,
+        classProbs=TRUE,
+        sampling = 'up'
+        )
+
+```
+
+```{r eval=FALSE, include=TRUE}
+
+# Tunear upsample
+
+fitControlrf_imb$seeds <- rf_fit_orig$control$seeds
+
+t0 <- proc.time()
+rf_fit_up <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf_imb,
+                 tuneGrid = grid_rf,
+                 metric='ROC'
+)
+proc.time() -  t0
+
+saveRDS(rf_fit_up, '../models/rf_fit_up.RDS')
+```
+
+```{r include=FALSE}
+rf_fit_up <- readRDS('../models/rf_fit_up')
+
+```
+
+
+
+```{r eval=FALSE, include=TRUE}
+# Tunear downsample
+
+fitControlrf_imb$sampling <- "down"
+fitControlrf_imb$seeds <- rf_fit_orig$control$seeds
+
+
+t0 <- proc.time()
+rf_fit_down <-  train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = fitControlrf_imb,
+                 tuneGrid = grid_rf,
+                 metric='ROC'
+)
+proc.time() -  t0
+
+#saveRDS(rf_fit_down, '../models/rf_fit_down.RDS')
+
+```
+
+```{r include=FALSE}
+rf_fit_down <- readRDS('../models/rf_fit_down.RDS')
+```
+
+
+```{r eval=FALSE, include=FALSE}
+rf_fit_smote <- readRDS('../models/rf_fit_smote.RDS')
+```
+
+
+Colocamos todos los modelos en una lista:
+
+```{r}
+model_list <- list(original = rf_fit_orig,
+                   weighted = rf_fit_wei,
+                   down = rf_fit_down,
+                   up = rf_fit_up)
+
+```
+
+
+Extraigamos algunas métricas resumen de las matrices de confusión:
+
+```{r}
+extract_conf_metrics <- function(model, data, obs){
+        preds <- predict(model, data)        
+        c<-confusionMatrix(preds, obs)
+        results <- c(c$overall[1], c$byClass)
+        return(results)
+}
+
+```
+
+
+```{r}
+
+model_metrics <- model_list %>%
+        map(extract_conf_metrics, data=test, obs = test$imp_inglab1) %>%
+        do.call(rbind,.)
+
+```
+
+```{r}
+model_metrics
+```
+
+
+
+
