@@ -45,8 +45,8 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 # Clase 3. 
 - [Explicación y práctica - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
 - [Explicación y práctica - RCode](/clase_3/scripts/rf_boosting_script.R)
-- [Slides Boosting - pdf](/clase_2/slides/Boosting.pdf)
-
+- [Slides Boosting - pdf](/clase_3/slides/Boosting.pdf)
+git
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
 - [![](img/Download.png)](clase_3.zip)
