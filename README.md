@@ -31,14 +31,27 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 2. 
-- [Explicación y práctica - Notebook](/clase_2/notebook/cart_bagging_rf_notebook.nb.html)
-- [Explicación y práctica - RCode](/clase_2/scripts/cart_bagging_rf_notebook.R)
+- [Explicación y práctica - Notebook](/clase_2/notebook/cart_notebook.nb.html)
+- [Explicación y práctica - RCode](/clase_2/scripts/cart_script.R)
 - [Slides CART - pdf](/clase_2/slides/CARTS.pdf)
 - [Slides Bagging/RF - pdf](/clase_2/slides/Ensamble_Bagging_RF.pdf)
 
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
 - [![](img/Download.png)](clase_2.zip)
+
+
+
+# Clase 3. 
+- [Explicación y práctica - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
+- [Explicación y práctica - RCode](/clase_3/scripts/rf_boosting_script.R)
+- [Slides Boosting - pdf](/clase_2/slides/Boosting.pdf)
+
+Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
+
+- [![](img/Download.png)](clase_3.zip)
+
+
 
 # Librerías a utilizar
 El taller se desarrollará en R y se hará un uso extensivo de las siguientes librerías:

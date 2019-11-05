@@ -2,6 +2,7 @@
 /biblio
 /clase_1/slides/TEX
 /clase_1/slides/img
+/clase_3/models/adaboost_fit_orig.RDS
 
 # History files
 .Rhistory
