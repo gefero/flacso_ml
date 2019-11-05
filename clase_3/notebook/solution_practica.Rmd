@@ -1,0 +1,167 @@
+---
+title: "Práctica independiente - SOLUCION"
+output: html_notebook
+---
+
+## Entrenando dos modelos para predecir ingresos
+
+El objetivo de esta práctica es que puedan entrenar dos modelos con `caret` y compararlos. Para ello, volveremos al problema de regresión original: queremos construir un modelo que permita predecir los ingresos de la ocupación principal ($p21$) de los ocupados en la semana de referencia encuestados en el II Trimestre de 2015.
+
+Para ello, deberán entrenar una regresión lineal y un modelo de random forest y comparar sus performances:
+
+
+### Importar las librerías a utilizar
+
+```{r, message=FALSE}
+library(caret)
+library(tidyverse)
+library(rpart)
+```
+
+
+### Importar y setear los datos correctamente
+
+```{r}
+
+load('../data/EPH_2015_II.RData')
+
+data$pp03i<-factor(data$pp03i, labels=c('1-SI', '2-No', '9-NS'))
+
+
+
+data$intensi<-factor(data$intensi, labels=c('1-Sub_dem', '2-SO_no_dem', 
+                                            '3-Ocup.pleno', '4-Sobreoc',
+                                            '5-No trabajo', '9-NS'))
+
+data$pp07a<-factor(data$pp07a, labels=c('0-NC',
+                                        '1-Menos de un mes',
+                                        '2-1 a 3 meses',
+                                        '3-3 a 6 meses',
+                                        '4-6 a 12 meses',
+                                        '5-12 a 60 meses',
+                                        '6-Más de 60 meses',
+                                        '9-NS'))
+
+df_imp <- data %>%
+        filter(imp_inglab1==1) %>%
+        select(-imp_inglab1)
+
+df_train <- data %>%
+        filter(imp_inglab1==0) %>%
+        select(-imp_inglab1) %>%
+        mutate(p21 = case_when(
+                        p21==0 ~ 100,
+                        TRUE ~ p21))
+
+
+```
+
+
+
+### Hacer un train-test split
+
+```{r}
+set.seed(1234)
+tr_index <- createDataPartition(y=df_train$p21,
+                                p=0.8,
+                                list=FALSE)
+
+train <- df_train[tr_index,]
+test <- df_train[-tr_index,]
+
+```
+
+
+## Entrenar la regresión lineal
+
+```{r}
+lm_fit <- lm(p21~., data=df_train)
+```
+
+
+## Setear la partición para el tuneo del reandom forest
+
+```{r}
+
+set.seed(7412)
+cv_index_final <- createFolds(y = df_train$p21,
+                        k=5,
+                        list=TRUE,
+                        returnTrain=TRUE)
+
+fitControl <- trainControl(
+        indexOut=cv_index_final, 
+        method="cv",
+        number=5,
+        allowParallel=FALSE)
+
+
+```
+
+
+### Generar la grilla de hiperparámetros
+
+```{r}
+
+grid_rf <- expand.grid(mtry=c(10, 23, 25),
+                    splitrule='variance',
+                    min.node.size=c(5, 10, 20))
+
+
+```
+
+
+### Entrenar el modelo
+
+```{r}
+t0<-proc.time()
+rf_fit_regresion <- train(p21 ~ ., data = df_train, 
+                 method = "ranger", 
+                 trControl = fitControl,
+                 tuneGrid = grid_rf,
+                 verbose = FALSE)
+proc.time() - t0
+
+rf_fit_regresion
+```
+
+### Realizar las predicciones en el test-set y comparar
+
+```{r}
+eval_regression <- function(model, test_set, y){
+        preds <- predict(model, test_set)
+        
+        metrics <- postResample(preds, y) 
+        return(metrics)
+}
+
+
+models <- list(lm = lm_fit,
+               rf = rf_fit_regresion)
+
+
+model_metrics <- models %>%
+        map(eval_regression, test, test$p21)
+
+model_metrics
+
+```
+
+
+### Comparar en un scatter_plot las predicciones de cada modelo con los valores reales
+
+```{r}
+model_preds <- models %>%
+        map(predict, test) %>%
+        as_tibble() %>%
+        mutate(y = test$p21)
+
+ggplot(model_preds) + 
+        geom_point(aes(x=lm, y=y, color='Modelo Lineal')) + 
+        geom_point(aes(x=rf, y=y, color='Random Forest')) +
+        labs(x = "Predicciones",
+             y = "Observados",
+             color='Modelos')
+
+```
+

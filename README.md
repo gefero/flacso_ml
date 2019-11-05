@@ -31,8 +31,8 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 2. 
-- [Explicación y práctica - Notebook](/clase_2/notebook/cart_notebook.nb.html)
-- [Explicación y práctica - RCode](/clase_2/scripts/cart_script.R)
+- [Explicación y práctica guiada - Notebook](/clase_2/notebook/cart_notebook.nb.html)
+- [Explicación y práctica guiada - RCode](/clase_2/scripts/cart_script.R)
 - [Slides CART - pdf](/clase_2/slides/CARTS.pdf)
 - [Slides Bagging/RF - pdf](/clase_2/slides/Ensamble_Bagging_RF.pdf)
 
@@ -43,8 +43,10 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 3. 
-- [Explicación y práctica - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
-- [Explicación y práctica - RCode](/clase_3/notebook/rf_boosting_script.R)
+- [Explicación y práctica guiada - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
+- [Explicación y práctica guiada - RCode](/clase_3/notebook/rf_boosting_script.R)
+- [Consignas práctica independiente - Notebook](/clase_3/notebook/practica.nb.html)
+- [Soluciones práctica independiente - Notebook](/clase_3/notebook/solution_practica.nb.html)
 - [Slides Boosting - pdf](/clase_3/slides/Boosting.pdf)
 git
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
