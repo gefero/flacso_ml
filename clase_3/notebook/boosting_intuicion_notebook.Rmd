@@ -1,0 +1,192 @@
+---
+title: "Entendiendo Gradient Boosting Machines"
+author: "Germán Rosati"
+output: html_notebook
+---
+
+
+### Objetivos
+
+La idea de este notebook es poder dar una intuición acerca de cómo funcionan los métodos basados en Gradient Boosting. Para ello, utilizaremos un dataset de juguete.
+
+
+### Gradient Boosting Machines... ¿qué son?
+
+Ahora bien, la idea general detrás de los Gradient Boosting Machines (GBM, a partir de ahora), es igual a la de los métodos de Boosting en general: entrenar modelos fuertes a partir de un ensamble de modelos débiles. Se hace, igualmente, entrenando clasificadores de manera secuencia, en dónde cada uno de los clasificadores posteriores se centra en los errores del clasificador anterior.
+
+La principal diferencia con AdaBoost es que, en lugar de jugar con los pesos de cada instancia en cada iteración, GBM trata de fitear un modelo sobre los residuos del modelo anterior.
+
+
+Así, se trata de modelos de tipo aditivo. La idea general es que la predicción final es generada por la suma de diversos modelos parciales:
+
+$\hat{y} =  h_{1}(X) + h_{2}(X) + h_{3}(X) + ... + h_{m}(X)$
+
+$\hat{y} = \sum_{m=1}^M h_{m}(X)$
+
+Puede pensarse de forma análoga a la descomposición de una serie temporal, donde la series es pensada como una composición aditiva de una componente de tendencia $T_{t}$, una de ciclo $C_{y}$, una estacional $S_{t}$ y otra de ruido $\mu_{t}$:
+
+$y_{t} = T_{t} + C_{t} + S_{t} + \mu_{t}$
+
+Para seguir profundizando [aquí](https://explained.ai/gradient-boosting/index.html) hay un tutorial de carácter sumamente intuitivo.
+
+
+### Un ejemplo para construir la intuición
+
+Veamos un ejemplo usando árboles de decisión, recordando que se trata de un meta-algoritmo por lo cual podríamos usar (casi) cualquier otro método.
+
+Generamos nuestros datos
+
+```{r}
+set.seed(42)
+X <- runif(100, 0, 1) - 0.5
+y <- 3*X**2 + 0.05 * runif(100,0,4)
+
+df <- cbind(X,y) %>% as_tibble()
+
+rm(X,y)
+
+```
+
+En primer lugar, entrenemos un árbol de decisión sobre nuestro dataset y agreguemos las predicciones como columnas en el dataset:
+
+```{r}
+tree_1 <- rpart(y~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+
+df <- df %>% mutate(h_1 = predict(tree_1, df),
+                p_1 = h_1,
+                y_1 = y - p_1)
+
+```
+
+Ahora, entrenemos un segundo árbol pero sobre los residuos del anterior, es decir, sobre $y_{i} - \hat{y_{i}}$ o más precisamente: `y - predict(tree_1, df)` y agreguemos, una vez más, los resultados al dataset:
+
+
+```{r}
+tree_2 <- rpart(y_1~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+df <- df %>% mutate(h_2 = predict(tree_2, df),
+                    p_2 = p_1 + h_2,
+                    y_2 = y - p_2)
+```
+
+Repitamos el proceso una tercera vez... y una cuarta y una quinta y una sexta...
+
+
+```{r}
+tree_3 <- rpart(y_2~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+
+df <- df %>% mutate(h_3 = predict(tree_3, df),
+                    p_3 = p_2 + h_3,
+                    y_3 = y - p_3)
+
+tree_4 <- rpart(y_3~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+
+df <- df %>% mutate(h_4 = predict(tree_4, df),
+                    p_4 = p_3 + h_4,
+                    y_4 = y - p_4)
+
+tree_5 <- rpart(y_4~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+
+df <- df %>% mutate(h_5 = predict(tree_5, df),
+                    p_5 = p_4 + h_5,
+                    y_5 = y - p_5)
+
+tree_6 <- rpart(y_5~X, data=df, method='anova', control=list(cp=0.0000001, maxdepth=2))                
+
+df <- df %>% mutate(h_6 = predict(tree_6, df),
+                    p_6 = p_5 + h_6,
+                    y_6 = y - p_6)
+
+```
+
+Ahora tenemos un ensable que consiste en seis árboles de decisión. Podemos hacer una predicción sobre una instancia nueva simplemente agregando las predicciones de nuestros seis árboles.
+
+```{r fig.height=10}
+ggpubr::ggarrange(ncol=2, nrow=3,
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y), color='blue') + 
+                          geom_line(aes(x=X, y=h_1), color='green'),
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y), color='blue') + 
+                          geom_line(aes(x=X, y=p_1), color='red') +
+                          scale_y_continuous(limits=c(-0.4,1)),
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y_1), color='blue') + 
+                          geom_line(aes(x=X, y=h_2), color='green') +
+                          scale_y_continuous(limits=c(-0.4,1)),
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y), color='blue') + 
+                          geom_line(aes(x=X, y=p_2), color='red'),
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y_2), color='blue') + 
+                          geom_line(aes(x=X, y=h_3), color='green') +
+                          scale_y_continuous(limits=c(-0.4,1)),
+                  ggplot(df) + 
+                          geom_point(aes(x=X, y=y), color='blue') + 
+                          geom_line(aes(x=X, y=p_3), color='red')
+)
+```
+
+El plot muestra cómo va evolucionando el modelo a medida que vamos agregando una mayor cantidad de iteraciones. A la izquierda tenemos el ajuste de cada modelo con su propia variable dependiente (es decir, los residuos del modelo anterior) y a la derecha, el ajuste del ensamble global sobre $X$ e $y$.
+
+Puede verse cómo el ensamble se va haciendo cada vez más preciso a medida que vamos agregando modelos.
+
+
+### ¿Cuáles son los hiperparámetros de GBM?
+
+Vamos a ver algunos parámetros de GBM en caret y su interpretación. El método se llama "GBM" y se usa, como siempre, en la función `train`. 
+
+Vemos que en `tuneGrid` hay cuatro parámetros para evaluar:
+
+- `n.trees`: es la cantidad de modelos a entrenar; es decir, la cantidad de iteraciones
+- `interaction.depth`: la complejidad de cada árbol de decisión
+- `shrinkage`: también llamada _learning rate_ en otros lenguajes e implementaciones, y puede interpretarse como la contribución de cada árbol al modelo final... al setear un `shrinkage` bajo, por ejemplo, `shrinkage=0.1` será necesario una mayor cantidad de árboles para entrenar, pero los resultados tenderán a ser mejores. 
+- `n.minobsinnode`: el tamaño mínimo para poder hacer un split en cada nodo
+
+Entrenaremos dos GBM, uno con pocos árboles y _learing rate_ alto y otro con las características inversas:
+
+```{r}
+library(caret)
+trainControl <- trainControl(method='none')
+
+gbm <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=3,
+                                 interaction.depth=3,
+                                 shrinkage=1,
+                                 n.minobsinnode=2)
+)
+
+gbm_slow <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=200,
+                                 interaction.depth=3,
+                                 shrinkage=0.1,
+                                 n.minobsinnode=2)
+             )
+
+
+```
+
+
+Agregamos las predicciones al dataset y ploteamos:
+
+```{r}
+df <- df %>% mutate(y_gbm=predict(gbm, df),
+                    y_gbm_slow=predict(gbm_slow, df))
+
+ggpubr::ggarrange(
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm)) +
+        labs(title='n.trees=3, shrinkage=1'),
+
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm_slow)) +
+        labs(title='n.trees=200, shrinkage=0.1')
+)
+```
+
+¿Cómo describir a cada uno? El de la izquierda parece no ser lo suficientemente flexible, mientras que el de la derecha parece generar _overfitting_ de forma bastante clara.
