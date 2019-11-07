@@ -27,7 +27,7 @@ Puede pensarse de forma análoga a la descomposición de una serie temporal, don
 
 $y_{t} = T_{t} + C_{t} + S_{t} + \mu_{t}$
 
-Para seguir profundizando [aquí](https://explained.ai/gradient-boosting/index.html) hay un tutorial de carácter sumamente intuitivo.
+Para seguir profundizando [aquí](https://explained.ai/gradient-boosting/index.html) hay un tutorial de carácter sumamente intuitivo. También pueden consultar el [libro de Aurelien Geron](https://www.amazon.com/Hands-Machine-Learning-Scikit-Learn-TensorFlow-ebook/dp/B06XNKV5TS) del cual tomamos y tradujimos a R este ejemplo, escrito originalmente en Python.
 
 
 ### Un ejemplo para construir la intuición
