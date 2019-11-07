@@ -222,12 +222,12 @@ gbm_slow <- train(y~X, method='gbm',
                                  n.minobsinnode=2)
              )
 
-gbm_slow_01 <- train(y~X, method='gbm',
+gbm_slow_05 <- train(y~X, method='gbm',
              data=df,
              trControl=trainControl,
              tuneGrid=data.frame(n.trees=200,
                                  interaction.depth=3,
-                                 shrinkage=0.01,
+                                 shrinkage=0.05,
                                  n.minobsinnode=2)
              )
 
@@ -251,7 +251,7 @@ df <- df %>% mutate(y_gbm=predict(gbm, df),
                     y_gbm_n3_s01=predict(gbm_n3_s01, df),
                     y_gbm_n200_s1=predict(gbm_n200_s1, df),
                     y_gbm_slow=predict(gbm_slow, df),
-                    y_gbm_slow_01=predict(gbm_slow_01, df),
+                    y_gbm_slow_05=predict(gbm_slow_05, df),
                     y_gbm_slow_001=predict(gbm_slow_001, df)
                     )
 
@@ -279,8 +279,8 @@ ggplot(df) +
 
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
-        geom_line(aes(x=X,y=y_gbm_slow_01)) +
-        labs(title='n.trees=200, shrinkage=0.01'),
+        geom_line(aes(x=X,y=y_gbm_slow_05)) +
+        labs(title='n.trees=200, shrinkage=0.05'),
 
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
