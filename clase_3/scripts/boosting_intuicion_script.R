@@ -1,4 +1,8 @@
-## ------------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE----------------------------------------
+library(tidyverse)
+library(rpart)
+library(caret)
+
 set.seed(42)
 X <- runif(100, 0, 1) - 0.5
 y <- 3*X**2 + 0.05 * runif(100,0,4)
@@ -52,15 +56,14 @@ df <- df %>% mutate(h_6 = predict(tree_6, df),
 
 
 
-## ----fig.height=10-------------------------------------------------------
+## ----fig.height=15, fig.width=10-----------------------------------------
 ggpubr::ggarrange(ncol=2, nrow=3,
                   ggplot(df) + 
                           geom_point(aes(x=X, y=y), color='blue') + 
                           geom_line(aes(x=X, y=h_1), color='green'),
                   ggplot(df) + 
                           geom_point(aes(x=X, y=y), color='blue') + 
-                          geom_line(aes(x=X, y=p_1), color='red') +
-                          scale_y_continuous(limits=c(-0.4,1)),
+                          geom_line(aes(x=X, y=p_1), color='red'),
                   ggplot(df) + 
                           geom_point(aes(x=X, y=y_1), color='blue') + 
                           geom_line(aes(x=X, y=h_2), color='green') +
@@ -79,7 +82,6 @@ ggpubr::ggarrange(ncol=2, nrow=3,
 
 
 ## ------------------------------------------------------------------------
-library(caret)
 trainControl <- trainControl(method='none')
 
 gbm <- train(y~X, method='gbm',
@@ -87,9 +89,28 @@ gbm <- train(y~X, method='gbm',
              trControl=trainControl,
              tuneGrid=data.frame(n.trees=3,
                                  interaction.depth=3,
-                                 shrinkage=1,
+                                 shrinkage=1.0,
                                  n.minobsinnode=2)
 )
+
+
+gbm_n3_s01 <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=3,
+                                 interaction.depth=3,
+                                 shrinkage=0.1,
+                                 n.minobsinnode=2)
+             )
+
+gbm_n200_s1 <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=200,
+                                 interaction.depth=3,
+                                 shrinkage=1,
+                                 n.minobsinnode=2)
+             )
 
 gbm_slow <- train(y~X, method='gbm',
              data=df,
@@ -103,15 +124,29 @@ gbm_slow <- train(y~X, method='gbm',
 
 
 
-## ------------------------------------------------------------------------
+## ----fig.height=10, fig.width=10-----------------------------------------
 df <- df %>% mutate(y_gbm=predict(gbm, df),
-                    y_gbm_slow=predict(gbm_slow, df))
+                    y_gbm_n3_s01=predict(gbm_n3_s01, df),
+                    y_gbm_n200_s1=predict(gbm_n200_s1, df),
+                    y_gbm_slow=predict(gbm_slow, df)
+                    )
 
 ggpubr::ggarrange(
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
         geom_line(aes(x=X,y=y_gbm)) +
         labs(title='n.trees=3, shrinkage=1'),
+
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm_n3_s01)) +
+        labs(title='n.trees=3, shrinkage=0.1'),
+
+
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm_n200_s1)) +
+        labs(title='n.trees=200, shrinkage=1'),
 
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
