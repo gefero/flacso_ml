@@ -75,7 +75,9 @@ test <- df_train[-tr_index,]
 ## Entrenar la regresión lineal
 
 ```{r}
-lm_fit <- lm(p21~., data=df_train)
+lm_fit <- train(p21~., method='lm',
+                data=train,
+                trControl=trainControl(method='none'))
 ```
 
 
@@ -124,6 +126,11 @@ proc.time() - t0
 
 rf_fit_regresion
 ```
+
+```{r, include=FALSE}
+rf_fit_regresion <- readRDS('../../clase_3/models/rf_fit_regresion.RDS')
+```
+
 
 ### Realizar las predicciones en el test-set y comparar
 
