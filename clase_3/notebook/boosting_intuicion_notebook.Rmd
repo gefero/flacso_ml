@@ -222,6 +222,24 @@ gbm_slow <- train(y~X, method='gbm',
                                  n.minobsinnode=2)
              )
 
+gbm_slow_01 <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=200,
+                                 interaction.depth=3,
+                                 shrinkage=0.01,
+                                 n.minobsinnode=2)
+             )
+
+gbm_slow_001 <- train(y~X, method='gbm',
+             data=df,
+             trControl=trainControl,
+             tuneGrid=data.frame(n.trees=200,
+                                 interaction.depth=3,
+                                 shrinkage=0.001,
+                                 n.minobsinnode=2)
+             )
+
 
 ```
 
@@ -232,10 +250,12 @@ Agregamos las predicciones al dataset y ploteamos:
 df <- df %>% mutate(y_gbm=predict(gbm, df),
                     y_gbm_n3_s01=predict(gbm_n3_s01, df),
                     y_gbm_n200_s1=predict(gbm_n200_s1, df),
-                    y_gbm_slow=predict(gbm_slow, df)
+                    y_gbm_slow=predict(gbm_slow, df),
+                    y_gbm_slow_01=predict(gbm_slow_01, df),
+                    y_gbm_slow_001=predict(gbm_slow_001, df)
                     )
 
-ggpubr::ggarrange(
+ggpubr::ggarrange(ncol=2, nrow=3,
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
         geom_line(aes(x=X,y=y_gbm)) +
@@ -255,7 +275,17 @@ ggplot(df) +
 ggplot(df) + 
         geom_point(aes(x=X, y=y), color='blue') + 
         geom_line(aes(x=X,y=y_gbm_slow)) +
-        labs(title='n.trees=200, shrinkage=0.1')
+        labs(title='n.trees=200, shrinkage=0.1'),
+
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm_slow_01)) +
+        labs(title='n.trees=200, shrinkage=0.01'),
+
+ggplot(df) + 
+        geom_point(aes(x=X, y=y), color='blue') + 
+        geom_line(aes(x=X,y=y_gbm_slow_001)) +
+        labs(title='n.trees=200, shrinkage=0.001')
 )
 ```
 
