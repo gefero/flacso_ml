@@ -10,12 +10,48 @@ output: html_notebook
 La idea de este notebook es poder dar una intuición acerca de cómo funcionan los métodos basados en Gradient Boosting. Para ello, utilizaremos un dataset de juguete.
 
 
+### Gradient Descent en una carilla
+
+Recordemos: ¿cuáles son los principales elementos de un algoritmo de Machine Learning?
+
+- datos ($X$ e $y$)
+- algoritmo o hipótesis ($\hat{y}=f(X)$) que contiene 
+- parámetros (por ejemplo, $\beta_{0}, \beta_{1}, ..., \beta_{p}$ de un modelo de regresión lineal)
+- métrica de costo o _cost function_, una medida que sirve para evaluar la performance del modelo $\ell(y_{i} - \hat{y_{i}})$
+
+La función de costo debería servirnos para poder seleccionar cuál es el mejor set de parámetros. En líneas generales, queremos __miniminzar__ la función de costo. Por eso, los problemas de machine learnin (y en buena medida, los de estadística) son problemas de __optimización__.
+
+Pensemos en una regresión lineal simple 
+
+- tenemos nuestros datos $x$ e $y$
+- la hipótesis: $\hat{y_{i}} = \beta_{0} + \beta_{1}X_{1}$
+- los parámetros: $(\beta_{0}, \beta_{1})$
+- función de costo: $MSE = \frac{1}{N} \sum_{i=1}^N(y_{i} - \hat{y_{i}})^2$
+
+Una opción (poco recomendable) sería probar todos los valores posibles de $(\beta_{0},\beta_{1})$, digamos entre los infinitos negativos y los infitinos positivos, calcular las predicciones para cada uno, calcular $MSE$ para cada uno y elegir el $\beta_{1}$ que logra un valor mínimo en $MSE$, o dicho en lenguaje matemático: $\underset{\beta_{0},\beta_{1}}{\operatorname{argmax}}(\frac{1}{N} \sum_{i=1}^N(y_{i} - \hat{y_{i}})^2)$  
+
+En este punto, el problema se tranforma en un problema de optimización. Dado que en general, no es computacionalmente posible probar todos los valores de un parámetro (y mucho menos de miles o millones) se recurren a otro tipo de métodos. El más utilizado en sus diversas variables es el llamado _Gradient Descent_ o _Descenso de gradiente_.
+
+Si bien, no entraremos en sus sutilezas, solamente diremos que se trata de un procedimiento iterativo que hace uso de las propiedades de las derivadas (algo así como el ratio de cambio de la función de costo al cambiar el valor del parámetro) para ir actualizando los valores de los parámetros hasta llegar al mínimo:
+
+![](../img/gd.png)
+
+Calculando derivadas de la función de costo, llegamos a la siguente fórmula que permite ir actualizando los valores de $(\beta_{0}, \beta_{1})$ en un número fijo de iteraciones:
+
+$\beta_{0}^1 = \beta_{0}^0 - (y_{i} - \hat{y_{i}})  \times \gamma \times X$
+
+$\beta_{1}^1 = \beta_{1}^0 - (y_{i} - \hat{y_{i}}) \times \gamma$
+
+donde $\gamma$ es la derivada de la función de costo.
+
+Cuán pequeños (o grandes) son los cambios, dependerán del parámetro $\gamma$. también llamada _learning rate_.
+
+
 ### Gradient Boosting Machines... ¿qué son?
 
 Ahora bien, la idea general detrás de los Gradient Boosting Machines (GBM, a partir de ahora), es igual a la de los métodos de Boosting en general: entrenar modelos fuertes a partir de un ensamble de modelos débiles. Se hace, igualmente, entrenando clasificadores de manera secuencia, en dónde cada uno de los clasificadores posteriores se centra en los errores del clasificador anterior.
 
 La principal diferencia con AdaBoost es que, en lugar de jugar con los pesos de cada instancia en cada iteración, GBM trata de fitear un modelo sobre los residuos del modelo anterior.
-
 
 Así, se trata de modelos de tipo aditivo. La idea general es que la predicción final es generada por la suma de diversos modelos parciales:
 
@@ -36,7 +72,11 @@ Veamos un ejemplo usando árboles de decisión, recordando que se trata de un me
 
 Generamos nuestros datos
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rpart)
+library(caret)
+
 set.seed(42)
 X <- runif(100, 0, 1) - 0.5
 y <- 3*X**2 + 0.05 * runif(100,0,4)
@@ -100,7 +140,7 @@ df <- df %>% mutate(h_6 = predict(tree_6, df),
 
 Ahora tenemos un ensable que consiste en seis árboles de decisión. Podemos hacer una predicción sobre una instancia nueva simplemente agregando las predicciones de nuestros seis árboles.
 
-```{r fig.height=10}
+```{r fig.height=10, fig.width=10}
 ggpubr::ggarrange(ncol=2, nrow=3,
                   ggplot(df) + 
                           geom_point(aes(x=X, y=y), color='blue') + 
@@ -145,7 +185,6 @@ Vemos que en `tuneGrid` hay cuatro parámetros para evaluar:
 Entrenaremos dos GBM, uno con pocos árboles y _learing rate_ alto y otro con las características inversas:
 
 ```{r}
-library(caret)
 trainControl <- trainControl(method='none')
 
 gbm <- train(y~X, method='gbm',
