@@ -43,8 +43,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 3. 
-- [Explicación y práctica guiada - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
-- [Explicación y práctica guiada - RCode](/clase_3/scripts/rf_boosting_script.R)
 - [Intuición Gradient Boosting Machine - Notebook](/clase_3/notebook/boosting_intuicion_notebook.nb.html)
 - [Intuición Gradient Boosting Machine - RCode](/clase_3/scripts/boosting_intuicion_script.R)
 - [Consignas práctica independiente - Notebook](/clase_3/notebook/practica.nb.html)
