@@ -137,6 +137,12 @@ rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
 rf_fit_orig
 ```
 
+
+```{r}
+confusionMatrix(predict(rf_fit_orig, test), test$imp_inglab1)
+```
+
+
 - ¿Qué pueden decir de este modelo? 
 - ¿Funciona mejor que un árbol individual? 
 - ¿Qué sucede con su performance entre los `miss`
