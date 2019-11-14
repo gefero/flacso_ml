@@ -1,0 +1,125 @@
+---
+title: "Práctica Independiente - IML - Solution"
+author: "Germán Rosati"
+output: html_notebook
+---
+
+
+### Carga de librerías y datos
+
+```{r, message=FALSE}
+library(caret)
+library(tidyverse)
+library(rpart)
+
+df <- MASS::Boston %>% mutate(chas=factor(chas, labels=c('No','Si')))
+head(df)
+
+```
+
+
+### Entrenar un Gradient Boosting
+
+Entrenemos un modelo Random Forest con este dataset:
+
+```{r}
+set.seed(282)
+tr_index <- createDataPartition(y=df$medv,
+                                p=0.8,
+                                list=FALSE)
+
+train <- df[tr_index,]
+test <- df[-tr_index,]
+
+set.seed(499)
+cv_index <- createFolds(y=train$medv,
+                                k=5,
+                                list=TRUE,
+                                returnTrain=TRUE)
+
+
+gb_trControl <- trainControl(
+        index=cv_index,
+        method="cv",
+        number=5        
+        )
+
+gb_grid <- expand.grid(n.trees=200,
+                       interaction.depth=c(3,4,5),
+                       shrinkage=c(0.1, 0.01),
+                       n.minobsinnode=c(5,10)
+)
+```
+
+
+```{r}
+t0 <- proc.time()
+gb_fit <-  train(medv ~ . , 
+                 data = train, 
+                 method = "gbm", 
+                 trControl = gb_trControl,
+                 tuneGrid = gb_grid
+)
+proc.time() -  t0
+
+gb_fit
+
+```
+
+
+### Analizar la Variable Importance
+
+```{r}
+varimp <- function(data, y, model, loss='mse'){
+        bool <- !names(data) %in% y
+        X <- data[,bool]
+        predic <- iml::Predictor$new(model, data=X, y=data[y])
+        vi <- iml::FeatureImp$new(predic, loss='mse')
+        return(vi)
+}
+
+```
+
+```{r}
+ggpubr::ggarrange(
+plot(varimp(data=train, y='medv', model=gb_fit)),
+plot(varimp(data=test, y='medv', model=gb_fit, loss='mse'))
+)
+```
+
+
+### Construir y analizar los PDP
+
+
+```{r}
+library(pdp)
+```
+
+```{r}
+partial(gb_fit, pred.var='rm', plot=TRUE, plot.engine='ggplot', rug=TRUE)
+```
+
+```{r}
+pd <- partial(gb_fit, pred.var=c('rm', 'lstat'))
+plotPartial(pd)
+```
+
+
+### Analizar e interpretar los ICE
+
+```{r}
+ggpubr::ggarrange(
+        partial(gb_fit, pred.var='rm', plot=TRUE, ice=TRUE, rug=TRUE, 
+        plot.engine = 'ggplot', alpha=0.1),
+        partial(gb_fit, pred.var='lstat', plot=TRUE, ice=TRUE, rug=TRUE, 
+        plot.engine = 'ggplot', alpha=0.1)
+)
+```
+
+
+### Comparar los resultados con el caso de Random Forest
+
+```{r}
+###
+```
+

@@ -1,0 +1,56 @@
+---
+title: "Práctica Independiente - IML"
+author: "Germán Rosati"
+output: html_notebook
+---
+
+
+### Carga de librerías y datos
+
+```{r, message=FALSE}
+library(caret)
+library(tidyverse)
+library(rpart)
+
+df <- MASS::Boston %>% mutate(chas=factor(chas, labels=c('No','Si')))
+head(df)
+
+```
+
+
+### Entrenar un Gradient Boosting
+
+
+```{r}
+###
+```
+
+
+### Analizar la Variable Importance
+
+```{r}
+###
+```
+
+
+### Construir y analizar los PDP
+
+
+```{r}
+###
+```
+
+
+### Analizar e interpretar los ICE
+
+```{r}
+###
+```
+
+
+### Comparar los resultados con el caso de Random Forest
+
+```{r}
+###
+```
+
