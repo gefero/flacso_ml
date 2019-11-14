@@ -57,10 +57,10 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 4. 
-- [Explicación y práctica guiada | Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
-- [Explicación y práctica guiada | Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
-- [Interpretable ML](/clase_3/notebook/interpretable_ml_notebook.Rmd)
-- [Interpretable ML](/clase_3/notebook/interpretable_ml_script.R)
+- [Explicación y práctica guiada - Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
+- [Explicación y práctica guiada - Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
+- [Interpretable ML - Notebook](/clase_3/notebook/interpretable_ml_notebook.Rmd)
+- [Interpretable ML - RCode](/clase_3/notebook/interpretable_ml_script.R)
 
 
 
