@@ -61,7 +61,7 @@ df_train <- data %>%
 ### Hacer un train-test split
 
 ```{r}
-set.seed(1234)
+set.seed(6615)
 tr_index <- createDataPartition(y=df_train$p21,
                                 p=0.8,
                                 list=FALSE)
@@ -86,17 +86,16 @@ lm_fit <- train(p21~., method='lm',
 ```{r}
 
 set.seed(7412)
-cv_index_final <- createFolds(y = df_train$p21,
+cv_index_final <- createFolds(y = train$p21,
                         k=5,
-                        list=TRUE,
+                        list=FALSE,
                         returnTrain=TRUE)
 
 fitControl <- trainControl(
-        indexOut=cv_index_final, 
+        index=cv_index_final, 
         method="cv",
         number=5,
         allowParallel=FALSE)
-
 
 ```
 
@@ -104,25 +103,27 @@ fitControl <- trainControl(
 ### Generar la grilla de hiperparámetros
 
 ```{r}
-
-grid_rf <- expand.grid(mtry=c(10, 23, 25),
+grid_rf <- expand.grid(mtry=c(21),
                     splitrule='variance',
-                    min.node.size=c(5, 10, 20))
-
-
+                    min.node.size=c(1))
 ```
 
 
 ### Entrenar el modelo
 
+
+
+
 ```{r}
 t0<-proc.time()
-rf_fit_regresion <- train(p21 ~ ., data = df_train, 
+rf_fit_regresion <- train(p21 ~ ., data = train, 
                  method = "ranger", 
                  trControl = fitControl,
                  tuneGrid = grid_rf,
                  verbose = FALSE)
 proc.time() - t0
+
+saveRDS(rf_fit_regresion, '../models/rf_fit_regresion.RDS')
 
 rf_fit_regresion
 ```
@@ -171,4 +172,3 @@ ggplot(model_preds) +
              color='Modelos')
 
 ```
-

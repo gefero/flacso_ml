@@ -429,4 +429,3 @@ model_metrics
 ```
 
 Puede verse que cart, rf_original y adaboost presentan valores similares en accuracy. A su vez, al observar la relación entre precision y recall puede verse que el modelo que mejor balancea los dos es rf_up. Cuál elegir dependerá del objetivo del análisis.
-

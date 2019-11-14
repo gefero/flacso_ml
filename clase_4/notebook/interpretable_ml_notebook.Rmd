@@ -11,6 +11,18 @@ output: html_notebook
 
 ## Interpretabilidad
 
+Hasta aquí hemos venido tratando a los modelos vistos como cajas negras. Hemos priorizado capacidad predictiva por sobre interpretabilidad. No obstante, el problema de extraer conocimiento de los modelos que hemos llamado de "caja negra" no es una cuestión trivial. 
+
+En ese sentido, si bien la performance predicitiva de un modelo es sumamente importante, no otorga la información completa sobre el problema abordado. Si bien, en muchos casos es posible que querramos apoyarnos en un modelo con mayor capacidad predictiva, en otros, también podría ser necesario entender qué nos dice dicho modelo sobre el dataset en cuestión. Entender los "por qué" del funcionamiento de un modelo, además, nos puede dar información valiosa para entender cuándo y cómo el mismo puede fallar. Los modelos de machine learning pueden tomar sesgos de los datos sobre los que se entrenan, es por ello, que la "interptretabilidad" puede ser un buen insumo para entender dichos sesgos. 
+
+
+### Tipos de métodos de interpretabilidad
+
+En líneas generales, podemos pensar que existen modelos qué son interpretables intrínsecamente: una regresión lineal, un árbol de decisión son métodos que no requieren de aproximaciones complicadas para entender qué nos dicen sobre un problema. En estos casos, los parámetros del modelo o ciertos estadísticos resumen suelen ser suficientes para extraer la información que nos brindan.
+
+En algunos casos, existen _herramientas de interpretación específicas_: se limitan a clases de modelo específicas. La interpretación de los pesos de regresión en un modelo lineal es una interpretación específica del modelo, ya que, por definición, la interpretación de modelos intrínsecamente interpretables siempre es específica del modelo. Las redes neuronales son específicas del modelo. 
+
+Las herramientas _agnósticas de modelo_ se pueden usar en cualquier modelo de aprendizaje automático y se aplican después de que el modelo haya sido entrenado (post hoc). Estos métodos agnósticos generalmente funcionan analizando los pares de entrada y salida de características. Por definición, estos métodos no pueden tener acceso a los componentes internos del modelo, como los pesos o la información estructural.
 
 
 ## Carga de librerías y datos
@@ -22,55 +34,242 @@ library(rpart)
 ```
 
 
-## Cargamos los datos
+## Datos
+
+Vamos a trabajar con un dataset "foráneo": se trata de un dataset incluido en la librería `MASS` y que es ampliamente utilizado para ilustrar y testear modelos de Machine Learning y afines:
 
 ```{r}
-load('../data/EPH_2015_II.RData')
+df <- MASS::Boston %>% mutate(chas=factor(chas, labels=c('No','Si')))
+head(df)
+```
 
-data$pp03i<-factor(data$pp03i, labels=c('1-SI', '2-No', '9-NS'))
+Cada fila es un distrito del estado de Boston y cada variable mide diferentes atributos: 
+
+- `CRIM`: per capita crime rate by town
+- `ZN`: proportion of residential land zoned for lots over 25,000 sq.ft.
+- `INDUS`: proportion of non-retail business acres per town.
+- `CHAS`: Charles River dummy variable (1 if tract bounds river; 0 otherwise)
+- `NOX`: nitric oxides concentration (parts per 10 million)
+- `RM`: average number of rooms per dwelling
+- `AGE`: proportion of owner-occupied units built prior to 1940
+- `DIS`: weighted distances to five Boston employment centres
+- `RAD`: index of accessibility to radial highways
+- `TAX`: full-value property-tax rate per $10,000
+- `PTRATIO`: pupil-teacher ratio by town
+- `B`: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+- `LSTAT`: % lower status of the population
+- `MEDV`: Median value of owner-occupied homes in $1000's
+
+El objetivo será predecir el valor mediano de las propiedades en el condado -`MEDV`- según el resto de las varibles.
 
 
+## Random Forest
 
-data$intensi<-factor(data$intensi, labels=c('1-Sub_dem', '2-SO_no_dem', 
-                                            '3-Ocup.pleno', '4-Sobreoc',
-                                            '5-No trabajo', '9-NS'))
+Entrenemos un modelo Random Forest con este dataset:
 
-data$pp07a<-factor(data$pp07a, labels=c('0-NC',
-                                        '1-Menos de un mes',
-                                        '2-1 a 3 meses',
-                                        '3-3 a 6 meses',
-                                        '4-6 a 12 meses',
-                                        '5-12 a 60 meses',
-                                        '6-Más de 60 meses',
-                                        '9-NS'))
-
-
-
-data <- data %>%
-        mutate(imp_inglab1=factor(imp_inglab1, labels=c('non_miss','miss')))
-
-df_train <- data %>%
-        select(-p21)
-
-set.seed(1234)
-tr_index <- createDataPartition(y=df_train$imp_inglab1,
+```{r}
+set.seed(282)
+tr_index <- createDataPartition(y=df$medv,
                                 p=0.8,
                                 list=FALSE)
 
-train <- df_train[tr_index,]
-test <- df_train[-tr_index,]
+train <- df[tr_index,]
+test <- df[-tr_index,]
+
+set.seed(655)
+cv_index <- createFolds(y=train$medv,
+                                k=5,
+                                list=TRUE,
+                                returnTrain=TRUE)
+
+
+rf_trControl <- trainControl(
+        index=cv_index,
+        method="cv",
+        number=5        
+        )
+
+
+rf_grid <- expand.grid(mtry=1:13,
+                       min.node.size=c(5,10,15,20),
+                       splitrule='variance'
+                       )
 ```
+
+
+```{r}
+t0 <- proc.time()
+rf_fit <-  train(medv ~ . , 
+                 data = train, 
+                 method = "ranger", 
+                 trControl = rf_trControl,
+                 tuneGrid = rf_grid,
+                 importance='impurity')
+proc.time() -  t0
+```
+
+
+## Variable Importance
+
+Un primer instrumento para comenzar a entender e interpretar los modelos de "caja negra" es preguntarnos por la importancia de las variables. Esta pregunta en modelos de regresión tienen una respuesta más bien evidente: aquellos $\beta_{p}$ más grandes definirán las variables de mayor importancia, es decir, las que más "influyen" en $y$.
+
+En el caso de los modelos de ensamble la pregunta es ligeramente diferente: una variable es importante si "mezclando" sus valores el error de predicción se incrementa. Si una variable no es importante, entonces, mezclar sus valores no debería alterar el error. Un método para lograr esto es el siguiente:
+
+
+1. Calcular el error original ($e^\text{orig}\ell(y, f(X))$)
+2. Para cada feature $j=1,..., p$;
+        2.1 Generar una matriz nueva permutando $X_{j}$. Esto rompe la asociación entre $X_{j}$ e $y$.
+        2.2 Caclular $e^\text{perm}\ell(y, f(X^\text{perm}))$ sobre los datos permutados
+        2.3 Calcular la _permutation feature importance_ $FI_{j}=\frac{e^\text{perm}}{e^\text{orig}}$. También podría calcularse $FI_{j}=e^\text{perm}-e^\text{orig}$
+3. Ordenar las variables según $FI_{j}$
+
+
+Veamos. Vamos a usar un paquete llamado `iml`. Vamos a encapsular el proceso en una sola función.
+
+```{r}
+
+varimp <- function(data, y, model, loss='mse'){
+        bool <- !names(data) %in% y
+        X <- data[,bool]
+        predic <- iml::Predictor$new(model, data=X, y=data[y])
+        vi <- iml::FeatureImp$new(predic, loss='mse')
+        return(vi)
+}
+
+```
+
+Calculemos $FI$ sobre ambos sets de datos:
+
+```{r}
+ggpubr::ggarrange(
+plot(varimp(data=train, y='medv', model=rf_fit)),
+plot(varimp(data=test, y='medv', model=rf_fit, loss='mse')))
+```
+
+
+### Ventajas
+
+Se trata de una métrica sumamente intuitiva e interpretable: la importancia de una variable está definida como el incremento en el error cuando "desaparece" la información de la variable. Da una visión bastante resumida del modelo.
+
+Es comparable entre diferentes modelos, algoritmos y problemas,
+
+Incorpora en el análisis la interacción con otros features. Al romper la información de la variable analizada, también se rompen las interacciones entre esa variable y el resto. Esto puede ser visto como un problema también...
+
+No requiere reentrenar todo el modelo. De esta forma, se reduce el tiempo de cómputo. 
+
+
+### Desventajas
+
+No está claro si debe usarse en el train set o el test set. 
+
+Dado que utiliza un proceso de randomización, es necesario tener en cuenta que los resultados pueden variar si la randomización cambia. Suele ser bueno repetir la randomización y chequear los resultados pero esto incrementa el tiempo de cómputo.
+
+Si existe una correlación fuerte entre dos o más features entonces está métrica es engañosa. Al permutar las variables pueden generarse ejemplos "irreales". Por ejemplo, si tuviéramos como variables `peso` y `edad`, al permutar una de las dos, podría encontrar un caso en el que hay una persona de 2 años y 75 kg. 
+
+Por una razón parecida, incorporar features muy correlacionadas puede hacer que la importancia de un feature muy relevante se "divida" entre ellos.
 
 
 ## Partial Dependence Plots
 
-Comencemos analizando el random forest original que habíamos entrenado la semana anterior:
-
-```{r}
-rf_orig_clasif <- readRDS('../../clase_3/models/rf_fit_orig.RDS')
-rf_orig_regre <- 
-```
-
 Los gráficos de dependencia parcial permiten visualizar el efecto marginal de una o dos variables independientes sobre la variable predicha de un modelo de Machine Learning. Un plot de dependencia parcial puede mostrar si la relación entre $X$ e $y$ es lineal, monotónica, o algún patrón más complejo. Si aplicáramos un pdp a una regresión lineal, ¿cuál sería el patrón del gráfico?
 
-Para un
+Los PDP ayudan a visualizar la relación entre un subconjunto de las características (generalmente 1-3) y la respuesta al tiempo que explican el efecto promedio de los otros predictores en el modelo. Son particularmente efectivos con modelos de caja negra.
+
+Una forma intuitiva (no necesariamente eficiente) de construir un PDP es la siguiente:
+
+Para un predictor $X_{p}$, cuyos valores van de $X_{p}^1, ..., X_{p}^k$ su PDP puede ser construido de la siguiente forma:
+
+1. Para cada valor de $X_{p}^i$, tal que $i \in \{1,2,3,...,k\}$:
+        1.1 Copiar los datos de entrenamiento y reemplazar los valores originales de $X_{p}$ por la constante $X_{p}^i$
+        1.2 Hacer las predicciones del modelo sobre este dataset modificado
+        1.3 Calcular la predicción promedio
+2. Plotar los pares $\{X_{p}^i, \hat{f}(X_{p}^i\}$ para cada valor
+
+
+```{r}
+library(pdp)
+```
+
+
+```{r}
+partial(rf_fit, pred.var='rm')
+
+```
+
+
+El output es un data.frame que contiene cada valor de `rm` y la estimación efecto promedio de la variable dependiente `medv`. Podemos plotear esto de forma simple:
+
+```{r}
+partial(rf_fit, pred.var='rm', plot=TRUE, plot.engine='ggplot', rug=TRUE)
+```
+
+
+```{r}
+rf_fit %>%
+        partial(pred.var='rm') %>%
+        ggplot(aes(x=rm, y=yhat)) +
+                geom_line() +
+                geom_smooth(se=FALSE) 
+```
+
+Podemos ver, también dos variables al mismo tiempo:
+
+```{r}
+pd <- partial(rf_fit, pred.var=c('rm', 'lstat'))
+plotPartial(pd)
+```
+
+
+Veamos ahora qué pasa si ploteamos una variable cualitativa como predictor:
+
+```{r}
+partial(rf_fit, pred.var='chas') %>%
+        ggplot(aes(x=chas, y=yhat)) +
+                geom_bar(stat='identity')
+```     
+
+
+### Ventajas
+
+El cálculo de las PDP es sumamente intuitivo: la función de dependencia parcial en una feature  particular es algo así como la predicción promedio si forzamos a que todos los puntos asuman el mismo valor en esa feature. 
+
+Si la feature para la cual se ha computado la PDP no está correlacionada con el resto, entonces, las PDS represetan perfectamente cómo es la influencia de $X_{p}$ en primedio. En este caso la interpretación es clara: el plot muestra cómo cambia la predicción promedio en el dataset cuando el j-ésimo feature cambia. Si los features están correlacionados, entonces, es más complicado.
+
+Son fáciles de implementar.
+
+
+### Desventajas
+
+Hay un límite claro a la cantidad de features que pueden plotearse: 2. 
+
+En algunos PDP no se muestra la distribución de los features. Esto puede ser engañoso porque es posible que se "sobreinterprete" alguna región sin datos. Por eso, suele agregarse el "rug" a los PDPs.
+
+El supuesto de independencia es el mayor problema con los PDP. Sucede algo parecido al caso de las $FI$: al asumir indpendencia y "promediar" sobre el resto del feature, incluimos ciertos valores que pueden ser irreales para los valores del feature que estamos ploteando.  En otras palabras: cuando las características están correlacionadas, creamos nuevos puntos de datos en áreas de la distribución de características donde la probabilidad real es muy baja (por ejemplo, es poco probable que alguien mida 2 metros de altura pero pese menos de 50 kg). Una solución a este problema son las gráficas de efecto local acumulado o  ALE cortas que funcionan con la distribución condicional en lugar de la marginal.
+
+Cierto tipo de efectos pueden quedar ocultos porque los PDP solo nuestran el efecto marginal promedio. Supongamos que la mitad de los datos tienen una relación positiva con el feature -a mayor feature, mayor es la predicción- y la otra mitad, una relación inversa. El PDP va a mostrar una curva horizontal, porque muestra el promedio y los efectos se cancelan. Podría concluirse que el feature en cuestión no tiene efectos. Una solución a esto son los Individual Conditional Expectation Curves que plotean cada efecto individual, en lugar de los agregados.
+
+
+
+## Individual Conditional Expectation (ICE)
+
+
+El gráfico de dependencia parcial para el efecto promedio de una característica es un método global porque no se enfoca en instancias específicas, sino en un promedio general. El equivalente a un PDP para instancias de datos individuales se llama gráfico de expectativa condicional individual (ICE). Un gráfico ICE visualiza la dependencia de la predicción en una característica para cada instancia por separado, lo que da como resultado una línea por instancia, en comparación con una línea general en los gráficos de dependencia parcial. 
+
+Un PDP es el promedio de las líneas de un diagrama ICE. Los valores para una línea (y una instancia) se pueden calcular manteniendo todas las otras características iguales, creando variantes de esta instancia reemplazando el valor de la característica con valores de una cuadrícula y haciendo predicciones con el modelo de caja negra para estas instancias recién creadas. El resultado es un conjunto de puntos para una instancia con el valor de la característica de la cuadrícula y las predicciones respectivas.
+
+¿Cuál es el punto de mirar las expectativas individuales en lugar de las dependencias parciales? Las gráficas de dependencia parcial pueden oscurecer una relación heterogénea creada por las interacciones. Los PDP pueden mostrarle cómo se ve la relación promedio entre una característica y la predicción. Esto solo funciona bien si las interacciones entre las características para las cuales se calcula el PDP y las otras características son débiles. En caso de interacciones, la trama ICE proporcionará mucha más información.
+
+Veamos un ICE plot para las dos variables con mayor $FI$:
+
+```{r}
+ggpubr::ggarrange(
+        partial(rf_fit, pred.var='rm', plot=TRUE, ice=TRUE, rug=TRUE, 
+        plot.engine = 'ggplot', alpha=0.1),
+        partial(rf_fit, pred.var='lstat', plot=TRUE, ice=TRUE, rug=TRUE, 
+        plot.engine = 'ggplot', alpha=0.1)
+)
+```
+
+Podemos ver que en el primer plot, en la mayoría de los casos nos encontramos con que se mantiene la pauta original: a mayor `rm` -mayor cantidad promedio de ambientes por hogar- se observa un mayor precio mediano en los condados. Y, de hecho, parece haber un salto hacia los 7 ambientes. No obstante, existen algunos casos en los que esto no es así: de hecho, el precio mediano en algunos condados cae a partir de los 7 ambientes por hogar.
+
+En el segundo gráfico, y más allá de algunas diferecias menores, puede verse que todos los casos parecen cumplir la pauta original.

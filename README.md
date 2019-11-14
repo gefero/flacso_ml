@@ -50,10 +50,18 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [Consignas práctica independiente - Notebook](/clase_3/notebook/practica.nb.html)
 - [Soluciones práctica independiente - Notebook](/clase_3/notebook/solution_practica.nb.html)
 - [Slides Boosting - pdf](/clase_3/slides/Boosting.pdf)
-git
+
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
 - [![](img/Download.png)](clase_3.zip)
+
+
+# Clase 4. 
+- [Explicación y práctica guiada | Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
+- [Explicación y práctica guiada | Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
+- [Interpretable ML](/clase_3/notebook/interpretable_ml_notebook.Rmd)
+- [Interpretable ML](/clase_3/notebook/interpretable_ml_script.R)
+
 
 
 
