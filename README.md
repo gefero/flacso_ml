@@ -64,6 +64,17 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 
+# Clase 5. 
+Docente invitado: [Diego Kozlowski](https://sites.google.com/view/diego-kozlowski/home)
+
+- [Explicación Notebook](https://diegokoz.github.io/workshop_text_mining/1_explicacion.nb.html)
+- [Explicación Slides](/clase_4/slides/Text_Mining.pdf)
+- [Práctica Guiada - Notebook](https://diegokoz.github.io/workshop_text_mining/2_practica_guiada.nb.html)
+- [Práctica Independiente -  Notebook](https://diegokoz.github.io/workshop_text_mining/3_practica_independiente.nb.html)
+
+Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip del repostorio de Diego...
+
+- [![](img/Download.png)](https://github.com/DiegoKoz/workshop_text_mining/archive/master.zip)
 
 
 
