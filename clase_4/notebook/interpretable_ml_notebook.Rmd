@@ -8,6 +8,7 @@ output: html_notebook
 
 - Mostrar la implementación de algunos métodos de interpretación para modelos de Machine Learning
 
+
 ## Disclaimer
 
 Mucho del contenido de este tutorial está basado en [Interpretable Machine Learning. A Guide for Making Black Box Models Explainable](https://christophm.github.io/interpretable-ml-book/) de Cristpher Molnar, un texto súper recomendable.
@@ -42,9 +43,10 @@ library(rpart)
 
 Vamos a trabajar con un dataset "foráneo": se trata de un dataset incluido en la librería `MASS` y que es ampliamente utilizado para ilustrar y testear modelos de Machine Learning y afines:
 
-```{r}
+```{r echo=TRUE}
 df <- MASS::Boston %>% mutate(chas=factor(chas, labels=c('No','Si')))
 head(df)
+
 ```
 
 Cada fila es un distrito del estado de Boston y cada variable mide diferentes atributos: 
@@ -190,7 +192,7 @@ Para un predictor $X_{p}$, cuyos valores van de $X_{p}^1, ..., X_{p}^k$ su PDP p
 2. Plotar los pares $\{X_{p}^i, \hat{f}(X_{p}^i\}$ para cada valor
 
 
-```{r}
+```{r message=FALSE}
 library(pdp)
 ```
 
@@ -261,7 +263,7 @@ El gráfico de dependencia parcial para el efecto promedio de una característic
 
 Un PDP es el promedio de las líneas de un diagrama ICE. Los valores para una línea (y una instancia) se pueden calcular manteniendo todas las otras características iguales, creando variantes de esta instancia reemplazando el valor de la característica con valores de una cuadrícula y haciendo predicciones con el modelo de caja negra para estas instancias recién creadas. El resultado es un conjunto de puntos para una instancia con el valor de la característica de la cuadrícula y las predicciones respectivas.
 
-¿Cuál es el punto de mirar las expectativas individuales en lugar de las dependencias parciales? Las gráficas de dependencia parcial pueden oscurecer una relación heterogénea creada por las interacciones. Los PDP pueden mostrarle cómo se ve la relación promedio entre una característica y la predicción. Esto solo funciona bien si las interacciones entre las características para las cuales se calcula el PDP y las otras características son débiles. En caso de interacciones, la trama ICE proporcionará mucha más información.
+¿Cuál es el punto de mirar las expectativas individuales en lugar de las dependencias parciales? Los plots de dependencia parcial pueden oscurecer una relación heterogénea creada por las interacciones. Los PDP pueden mostrarle cómo se ve la relación promedio entre una característica y la predicción. Esto solo funciona bien si las interacciones entre las características para las cuales se calcula el PDP y las otras características son débiles. En caso de interacciones, la trama ICE proporcionará mucha más información.
 
 Veamos un ICE plot para las dos variables con mayor $FI$:
 
