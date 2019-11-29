@@ -8,6 +8,10 @@ output: html_notebook
 
 - Mostrar la implementación de algunos métodos de interpretación para modelos de Machine Learning
 
+## Disclaimer
+
+Mucho del contenido de este tutorial está basado en [Interpretable Machine Learning. A Guide for Making Black Box Models Explainable](https://christophm.github.io/interpretable-ml-book/) de Cristpher Molnar, un texto súper recomendable.
+
 
 ## Interpretabilidad
 
