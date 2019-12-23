@@ -6,6 +6,18 @@
 El objetivo de este curso es brindar una primera aproximación a algunos conceptos fundamentales de Machine Learning: hiperparámetros, sesgo-varianza, flujo de trabajo, error de generalización, serán algunos de los conceptos a trabajar.
 
 
+-----------------------------------------------------------------
+
+# Consignas Trabajo Final
+## Fecha de entrega: 29/02/2020
+
+- [Consignas](/tp_final/consignas.pdf)
+- [Datos](/tp_final/data/dptos_2014.csv)
+- [Descripción dataset](/tp_final/data/descripcion_data.pdf)
+
+-----------------------------------------------------------------
+
+
 
 # Contenidos y materiales
 
@@ -76,15 +88,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 - [![](img/Download.png)](https://github.com/DiegoKoz/workshop_text_mining/archive/master.zip)
 
-
-
-
-# Consignas Trabajo Final
-## Fecha de entrega: 29/02/2020
-
-- [Consignas](/tp_final/consignas.pdf)
-- [Datos](/tp_final/data/dptos_2014.csv)
-- [Descripción dataset](/tp_final/data/descripcion_data.pdf)
 
 
 
