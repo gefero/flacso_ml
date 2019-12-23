@@ -78,6 +78,16 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 
+
+# Consignas Trabajo Final
+## Fecha de entrega: 29/02/2020
+
+- [Consignas](/tp_final/consignas.pdf)
+- [Datos](/tp_final/data/dptos_2014.csv)
+- [Descripción dataset](/tp_final/data/descripcion_data.pdf)
+
+
+
 # Librerías a utilizar
 El taller se desarrollará en R y se hará un uso extensivo de las siguientes librerías:
 
