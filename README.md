@@ -24,10 +24,9 @@ El objetivo de este curso es brindar una primera aproximación a algunos concept
 - __Unidad 1.__ Modelos de aprendizaje automático: fundamentos conceptuales, diferencias con el enfoque estadístico tradicional.
 
 - __Unidad 2.__ Problemas de clasificación y regresión.
-Aprendizaje supervisado y no supervisado. Modelos simples y ensambles de modelos.
+Aprendizaje supervisado y no supervisado. Modelos simples y ensambles de modelos. CART, Bagging, Random Forest y Boosting.
 
-- __Unidad 3.__ Unidad Consideraciones para el diseño de modelos de aprendizaje automático con datos espaciales
-
+- __Unidad 3.__ Interpretable Machine Learning. Haciendo interpretables modelos de "caja negra".
 
 
 # Clase 1. 
@@ -75,19 +74,7 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [Soluciones práctica independiente - Notebook](/clase_4/notebook/practica_independiente_solution.nb.html)
 
 
-
-# Clase 5. 
-Docente invitado: [Diego Kozlowski](https://sites.google.com/view/diego-kozlowski/home)
-
-- [Explicación Notebook](https://diegokoz.github.io/workshop_text_mining/1_explicacion.nb.html)
-- [Explicación Slides](/clase_5/slides/Text_Mining.pdf)
-- [Práctica Guiada - Notebook](https://diegokoz.github.io/workshop_text_mining/2_practica_guiada.nb.html)
-- [Práctica Independiente -  Notebook](https://diegokoz.github.io/workshop_text_mining/3_practica_independiente.nb.html)
-
-Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip del repostorio de Diego...
-
-- [![](img/Download.png)](https://github.com/DiegoKoz/workshop_text_mining/archive/master.zip)
-
+# Clase 5. Repaso y cierre
 
 
 
@@ -110,3 +97,5 @@ install.packages('caret')
 - [James, G., Witten, D., Hastie, T. y Tibshirani, R. (2015), _Introduction to Statistical Learning_, Berlin: Springer.](http://faculty.marshall.usc.edu/gareth-james/ISL/)
 
 - [Kuhn, M. (s/f), _The `caret` package](http://topepo.github.io/caret/index.html)
+
+- [Molnar, C. (2020), _Interpretable Machine Learning. A Guide for Making Black Box Models Explainable.](https://christophm.github.io/interpretable-ml-book/)
