@@ -6,19 +6,6 @@
 El objetivo de este curso es brindar una primera aproximación a algunos conceptos fundamentales de Machine Learning: hiperparámetros, sesgo-varianza, flujo de trabajo, error de generalización, serán algunos de los conceptos a trabajar.
 
 
------------------------------------------------------------------
-
-# Consignas Trabajo Final
-## Fecha de entrega: 29/02/2020
-
-- [Consignas](/tp_final/consignas.pdf)
-- [Datos](/tp_final/data/dptos_2014.csv)
-- [Descripción dataset](/tp_final/data/descripcion_data.pdf)
-
------------------------------------------------------------------
-
-
-
 # Contenidos y materiales
 
 - __Unidad 1.__ Modelos de aprendizaje automático: fundamentos conceptuales, diferencias con el enfoque estadístico tradicional.
