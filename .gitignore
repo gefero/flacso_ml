@@ -1,12 +1,13 @@
 # Specific
 /biblio
 /clase_1/slides/TEX
+/clase_1/notebooks/
 /clase_1/slides/img
 /clase_3/models/adaboost_fit_orig.RDS
 /clase_5/workshop_text_mining-master
 /clase_5/slides/TEX
 /tp_final/previos
-
+/material_en_proceso/
 
 # History files
 .Rhistory
