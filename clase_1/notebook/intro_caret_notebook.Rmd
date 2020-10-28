@@ -1,4 +1,4 @@
-        ---
+       ---
         title: "Introducción (simple) a caret"
         author: "Germán Rosati"
         output: html_notebook
@@ -142,9 +142,10 @@ Comencemos con un modelo simple, pero efectivo: una regresión lineal. Como podr
 Entrenemos una regresión lineal con caret: comencemos con un modelo simple, sexo y edad.
 
 ```{r}        
-lm_p21 <- train(p21 ~ ch04 + ch06, data = df_train, 
-                 method = "lm", 
-                 trControl = fitControl)
+lm_p21 <- train(p21 ~ ch04 + ch06, 
+                data = df_train, 
+                method = "lm", 
+                trControl = fitControl)
 
 lm_p21
 ```
@@ -160,9 +161,10 @@ lm_p21$finalModel
 Veamos, ahora, un modelo más complejo:
 
 ```{r warning=FALSE}
-lm_p21_b <- train(p21 ~ ., data = df_train, 
-                 method = "lm", 
-                 trControl = fitControl)
+lm_p21_b <- train(p21 ~ ., 
+                  data = df_train, 
+                  method = "lm", 
+                  trControl = fitControl)
 ```
 
 ```{r}
