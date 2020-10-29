@@ -1754,12 +1754,25 @@ summary {
 <p>Este notebook es muy cortito y simplemente quiere mostrar dos ejemplos de implementación desde cero de un train test split y de validación cruzada:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShNQVNTKVxuZGF0YShCb3N0b24pXG5kZiA8LSBCb3N0b25cbnJtKEJvc3RvbilcbmBgYCJ9 -->
-<pre class="r"><code>library(MASS)
-data(Boston)
-df &lt;- Boston
-rm(Boston)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5cbmBgYCJ9 -->
+<pre class="r"><code>library(tidyverse)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxuXHUwMDFiWzM3beKUgOKUgCBcdTAwMWJbMW1BdHRhY2hpbmcgcGFja2FnZXNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2UgMS4zLjAg4pSA4pSAXHUwMDFiWzM5bVxuXHUwMDFiWzM3bVx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1nZ3Bsb3QyXHUwMDFiWzM3bSAzLjMuMCAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bXB1cnJyICBcdTAwMWJbMzdtIDAuMy4zXG5cdTAwMWJbMzJt4pyTXHUwMDFiWzM3bSBcdTAwMWJbMzRtdGliYmxlIFx1MDAxYlszN20gMy4wLjAgICAgIFx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1kcGx5ciAgXHUwMDFiWzM3bSAxLjAuMlxuXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bXRpZHlyICBcdTAwMWJbMzdtIDEuMC4yICAgICBcdTAwMWJbMzJt4pyTXHUwMDFiWzM3bSBcdTAwMWJbMzRtc3RyaW5nclx1MDAxYlszN20gMS40LjBcblx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1yZWFkciAgXHUwMDFiWzM3bSAxLjMuMSAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bWZvcmNhdHNcdTAwMWJbMzdtIDAuNS4wXHUwMDFiWzM5bVxuXHUwMDFiWzM3beKUgOKUgCBcdTAwMWJbMW1Db25mbGljdHNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG5cdTAwMWJbMzFteFx1MDAxYlszN20gXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzM3bTo6XHUwMDFiWzMybWZpbHRlcigpXHUwMDFiWzM3bSBtYXNrcyBcdTAwMWJbMzRtc3RhdHNcdTAwMWJbMzdtOjpmaWx0ZXIoKVxuXHUwMDFiWzMxbXhcdTAwMWJbMzdtIFx1MDAxYlszNG1kcGx5clx1MDAxYlszN206Olx1MDAxYlszMm1sYWcoKVx1MDAxYlszN20gICAgbWFza3MgXHUwMDFiWzM0bXN0YXRzXHUwMDFiWzM3bTo6bGFnKClcblx1MDAxYlszMW14XHUwMDFiWzM3bSBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzdtOjpcdTAwMWJbMzJtc2VsZWN0KClcdTAwMWJbMzdtIG1hc2tzIFx1MDAxYlszNG1NQVNTXHUwMDFiWzM3bTo6c2VsZWN0KClcdTAwMWJbMzltXG4ifQ== -->
+<pre><code>Registered S3 methods overwritten by 'dbplyr':
+  method         from
+  print.tbl_lazy     
+  print.tbl_sql      
+[37m── [1mAttaching packages[22m ────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──[39m
+[37m[32m✓[37m [34mggplot2[37m 3.3.0     [32m✓[37m [34mpurrr  [37m 0.3.3
+[32m✓[37m [34mtibble [37m 3.0.0     [32m✓[37m [34mdplyr  [37m 1.0.2
+[32m✓[37m [34mtidyr  [37m 1.0.2     [32m✓[37m [34mstringr[37m 1.4.0
+[32m✓[37m [34mreadr  [37m 1.3.1     [32m✓[37m [34mforcats[37m 0.5.0[39m
+[37m── [1mConflicts[22m ───────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+[31mx[37m [34mdplyr[37m::[32mfilter()[37m masks [34mstats[37m::filter()
+[31mx[37m [34mdplyr[37m::[32mlag()[37m    masks [34mstats[37m::lag()
+[31mx[37m [34mdplyr[37m::[32mselect()[37m masks [34mMASS[37m::select()[39m</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1779,8 +1792,8 @@ rm(Boston)</code></pre>
 <h4>2. Generamos un vector de índices</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF9pbmRleDwtc2FtcGxlKDE6bnJvdyhkZiksIHJvdW5kKHRlc3Rfc2l6ZSpucm93KGRmKSwwKSlcbmBgYCJ9 -->
-<pre class="r"><code>test_index&lt;-sample(1:nrow(df), round(test_size*nrow(df),0))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF9pbmRleCA8LSBzYW1wbGUoMTpucm93KGRmKSwgcm91bmQodGVzdF9zaXplKm5yb3coZGYpLDApKVxuYGBgIn0= -->
+<pre class="r"><code>test_index &lt;- sample(1:nrow(df), round(test_size*nrow(df),0))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1789,10 +1802,13 @@ rm(Boston)</code></pre>
 <h4>3. Usamos el vector de índices <code>test_index</code> para dividir en dos el dataset</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdDwtZGZbdGVzdF9pbmRleCxdXG50cmFpbjwtZGZbLXRlc3RfaW5kZXgsXVxuYGBgIn0= -->
-<pre class="r"><code>test&lt;-df[test_index,]
-train&lt;-df[-test_index,]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdCA8LSBkZiAlPiVcbiAgICAgICAgc2xpY2UoaW5kZXgpXG5gYGAifQ== -->
+<pre class="r"><code>test &lt;- df %&gt;%
+        slice(index)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gfmluZGV4IDogb2JqZWN0ICdpbmRleCcgbm90IGZvdW5kXG4ifQ== -->
+<pre><code>Error in ~index : object 'index' not found</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1811,6 +1827,23 @@ train&lt;-df[-test_index,]</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM1NFxuIn0= -->
 <pre><code>[1] 354</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="podemos-entonces-entrenar-una-regresión-en-train-y-evaluarla-en-test" class="section level4">
+<h4>5. Podemos, entonces, entrenar una regresión en <code>train</code> y evaluarla en <code>test</code></h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubTEgPC0gbG0obWVkdiB+IC4sIGRhdGE9dGVzdClcbnByZWRzIDwtIHByZWRpY3QobTEsIHRlc3QpXG5cbiMgRUNNXG5wYXN0ZTAoJ0Vycm9yIGN1YWRyw6F0aWNvIG1lZGlvOiAnLCBtZWFuKChwcmVkcyAtIHRlc3QkbWVkdikqKjIpKVxuYGBgIn0= -->
+<pre class="r"><code>m1 &lt;- lm(medv ~ ., data=test)
+preds &lt;- predict(m1, test)
+
+# ECM
+paste0('Error cuadrático medio: ', mean((preds - test$medv)**2))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86IDIwLjMwODE2ODQxMDQ0NFwiXG4ifQ== -->
+<pre><code>[1] &quot;Error cuadrático medio: 20.308168410444&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1845,22 +1878,49 @@ index&lt;-rep(1:k,length.out=nrow(df))</code></pre>
 <h4>3. Generamos un loop en el que vamos iterando sobre el vector de índices <code>index</code>; en cada iteración dividimos en train y test y entrenamos el modelo en <code>train</code> y predecimos en <code>test</code></h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWw8LWxpc3QoKVxucHJlZHM8LWxpc3QoKVxuZm9yIChpIGluIDE6ayl7XG4gICAgICAgIHRyYWluPC1kZlshKGluZGV4ICVpbiUgaSksXVxuICAgICAgICB0ZXN0PC1kZltpbmRleCAlaW4lIGksXVxuICAgICAgICBtb2RlbFtbaV1dPC1sbShtZWR2IH4uICwgZGF0YSA9IHRyYWluKVxuICAgICAgICBwcmVkc1tbaV1dPC1wcmVkaWN0KG1vZGVsW1tpXV0sIHRlc3QpXG59XG5gYGAifQ== -->
-<pre class="r"><code>model&lt;-list()
-preds&lt;-list()
-for (i in 1:k){
-        train&lt;-df[!(index %in% i),]
-        test&lt;-df[index %in% i,]
-        model[[i]]&lt;-lm(medv ~. , data = train)
-        preds[[i]]&lt;-predict(model[[i]], test)
-}</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZm9yIChpIGluIDE6ayl7XG4gICAgICAgIHRyYWluIDwtIGRmICU+JVxuICAgICAgICAgICAgICAgIGZpbHRlcighKGluZGV4ICVpbiUgaSkpICMgQWPDoSBpbHRyYW1vcyBsb3MgZGVsIGdydXBvIHVcbiAgICAgICAgdGVzdCA8LSBkZiAlPiVcbiAgICAgICAgICAgICAgICBmaWx0ZXIoaW5kZXggJWluJSBpKVxuICAgICAgICBwcmludChucm93KHRyYWluKSlcbiAgICAgICAgcHJpbnQobnJvdyh0ZXN0KSlcbiAgICAgICAgI21vZGVsW1tpXV08LWxtKG1lZHYgfi4gLCBkYXRhID0gdHJhaW4pXG4gICAgICAgICNwcmVkc1tbaV1dPC1wcmVkaWN0KG1vZGVsW1tpXV0sIHRlc3QpXG59XG5cbmBgYCJ9 -->
+<pre class="r"><code>for (i in 1:k){
+        train &lt;- df %&gt;%
+                filter(!(index %in% i)) # Acá iltramos los del grupo u
+        test &lt;- df %&gt;%
+                filter(index %in% i)
+        print(nrow(train))
+        print(nrow(test))
+        #model[[i]]&lt;-lm(medv ~. , data = train)
+        #preds[[i]]&lt;-predict(model[[i]], test)
+}
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQwNFxuWzFdIDEwMlxuWzFdIDQwNVxuWzFdIDEwMVxuWzFdIDQwNVxuWzFdIDEwMVxuWzFdIDQwNVxuWzFdIDEwMVxuWzFdIDQwNVxuWzFdIDEwMVxuIn0= -->
+<pre><code>[1] 404
+[1] 102
+[1] 405
+[1] 101
+[1] 405
+[1] 101
+[1] 405
+[1] 101
+[1] 405
+[1] 101</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="tenemos-una-lista-preds-con-todas-las-predicciones.-cómo-calcularían-el-error-cross-validado-del-modelo" class="section level4">
+<h4>4. Tenemos una lista <code>preds</code> con todas las predicciones. ¿Cómo calcularían el error cross validado del modelo?</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjXG5gYGAifQ== -->
+<pre class="r"><code>###</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
 </div>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRWplbXBsb3MgaWx1c3RyYXRpdm9zIGRlIHRyYWluLXRlc3Qgc3BsaXQgeSBjcm9zcy12YWxpZGF0aW9uIGRlc2RlIGNlcm8iCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEludHJvZHVjY2nDs24KRXN0ZSBub3RlYm9vayBlcyBtdXkgY29ydGl0byB5IHNpbXBsZW1lbnRlIHF1aWVyZSBtb3N0cmFyIGRvcyBlamVtcGxvcyBkZSBpbXBsZW1lbnRhY2nDs24gZGVzZGUgY2VybyBkZSB1biB0cmFpbiB0ZXN0IHNwbGl0IHkgZGUgdmFsaWRhY2nDs24gY3J1emFkYToKYGBge3J9CmxpYnJhcnkoTUFTUykKZGF0YShCb3N0b24pCmRmIDwtIEJvc3RvbgpybShCb3N0b24pCmBgYAoKCiMjIEltcGxlbWVudGFjacOzbiBzaW1wbGUgZGUgdHJhaW5fdGVzdCBzcGxpdAojIyMjIDEuIERlZmluaW1vcyBlbCB0YW1hw7FvIGRlbCB0ZXN0IHNldCAKYGBge3J9CnRlc3Rfc2l6ZTwtMC4zIApgYGAKCiMjIyMgMi4gR2VuZXJhbW9zIHVuIHZlY3RvciBkZSDDrW5kaWNlcwpgYGB7cn0KdGVzdF9pbmRleDwtc2FtcGxlKDE6bnJvdyhkZiksIHJvdW5kKHRlc3Rfc2l6ZSpucm93KGRmKSwwKSkKYGBgCgojIyMjIDMuIFVzYW1vcyBlbCB2ZWN0b3IgZGUgw61uZGljZXMgYHRlc3RfaW5kZXhgIHBhcmEgZGl2aWRpciBlbiBkb3MgZWwgZGF0YXNldApgYGB7cn0KdGVzdDwtZGZbdGVzdF9pbmRleCxdCnRyYWluPC1kZlstdGVzdF9pbmRleCxdCmBgYAoKIyMjIyA0LiBDb21wcm9iYW1vcyBlbCB0YW1hw7FvCmBgYHtyfQpwcmludChucm93KHRlc3QpKQpwcmludChucm93KHRyYWluKSkKYGBgCgoKIyMjIEltcGxlbWVudGFjacOzbiBzaW1wbGUgZGUgY3Jvc3MtdmFsaWRhdGlvbgojIyMjIDEuIE1lemNsYW1vcyBsb3MgY2Fzb3MKYGBge3J9CiMgU2h1ZmZsZSBkZSBjYXNvcwpzaHVmZjwtc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1ucm93KGRmKSwgcmVwbGFjZT1GQUxTRSkKZGY8LWRmW3NodWZmLF0Kcm0oc2h1ZmYpCmBgYAoKIyMjIyAyLiBEZWZpbmltb3MgbGEgY2FudGlkYWQgZGUgZ3J1cG9zIGBrYCB5IGdlbmVyYW1vcyB1biB2ZWN0b3IgZGUgw61uZGljZXMgYGluZGV4YCBwYXJhIGhhY2VyIGxhIHZhbGlkYWNpw7NuIGNydXphZGEKYGBge3J9IAprPC01CmluZGV4PC1yZXAoMTprLGxlbmd0aC5vdXQ9bnJvdyhkZikpCmBgYAoKIyMjIyAzLiBHZW5lcmFtb3MgdW4gbG9vcCBlbiBlbCBxdWUgdmFtb3MgaXRlcmFuZG8gc29icmUgZWwgdmVjdG9yIGRlIMOtbmRpY2VzIGBpbmRleGA7IGVuIGNhZGEgaXRlcmFjacOzbiBkaXZpZGltb3MgZW4gdHJhaW4geSB0ZXN0IHkgZW50cmVuYW1vcyBlbCBtb2RlbG8gZW4gYHRyYWluYCB5IHByZWRlY2ltb3MgZW4gYHRlc3RgCmBgYHtyfQptb2RlbDwtbGlzdCgpCnByZWRzPC1saXN0KCkKZm9yIChpIGluIDE6ayl7CiAgICAgICAgdHJhaW48LWRmWyEoaW5kZXggJWluJSBpKSxdICMgQWPDoSBpbHRyYW1vcyBsb3MgZGVsIGdydXBvIHUKICAgICAgICB0ZXN0PC1kZltpbmRleCAlaW4lIGksXQogICAgICAgIG1vZGVsW1tpXV08LWxtKG1lZHYgfi4gLCBkYXRhID0gdHJhaW4pCiAgICAgICAgcHJlZHNbW2ldXTwtcHJlZGljdChtb2RlbFtbaV1dLCB0ZXN0KQp9CmBgYAo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRWplbXBsb3MgaWx1c3RyYXRpdm9zIGRlIHRyYWluLXRlc3Qgc3BsaXQgeSBjcm9zcy12YWxpZGF0aW9uIGRlc2RlIGNlcm8iCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEludHJvZHVjY2nDs24KRXN0ZSBub3RlYm9vayBlcyBtdXkgY29ydGl0byB5IHNpbXBsZW1lbnRlIHF1aWVyZSBtb3N0cmFyIGRvcyBlamVtcGxvcyBkZSBpbXBsZW1lbnRhY2nDs24gZGVzZGUgY2VybyBkZSB1biB0cmFpbiB0ZXN0IHNwbGl0IHkgZGUgdmFsaWRhY2nDs24gY3J1emFkYToKYGBge3J9CmxpYnJhcnkoTUFTUykKbGlicmFyeSh0aWR5dmVyc2UpCmRhdGEoQm9zdG9uKQpkZiA8LSBCb3N0b24Kcm0oQm9zdG9uKQpgYGAKCgojIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIHRyYWluX3Rlc3Qgc3BsaXQKIyMjIyAxLiBEZWZpbmltb3MgZWwgdGFtYcOxbyBkZWwgdGVzdCBzZXQgCmBgYHtyfQp0ZXN0X3NpemUgPC0gMC4zIApgYGAKCiMjIyMgMi4gR2VuZXJhbW9zIHVuIHZlY3RvciBkZSDDrW5kaWNlcwpgYGB7cn0KdGVzdF9pbmRleCA8LSBzYW1wbGUoMTpucm93KGRmKSwgcm91bmQodGVzdF9zaXplKm5yb3coZGYpLDApKQpgYGAKCiMjIyMgMy4gVXNhbW9zIGVsIHZlY3RvciBkZSDDrW5kaWNlcyBgdGVzdF9pbmRleGAgcGFyYSBkaXZpZGlyIGVuIGRvcyBlbCBkYXRhc2V0CmBgYHtyfQp0ZXN0IDwtIGRmICU+JQogICAgICAgIHNsaWNlKHRlc3RfaW5kZXgpCnRyYWluIDwtIGRmICU+JQogICAgICAgIHNsaWNlKC10ZXN0X2luZGV4KQpgYGAKCiMjIyMgNC4gQ29tcHJvYmFtb3MgZWwgdGFtYcOxbwpgYGB7cn0KcHJpbnQobnJvdyh0ZXN0KSkKcHJpbnQobnJvdyh0cmFpbikpCmBgYAojIyMjIDUuIFBvZGVtb3MsIGVudG9uY2VzLCBlbnRyZW5hciB1bmEgcmVncmVzacOzbiBlbiBgdHJhaW5gIHkgZXZhbHVhcmxhIGVuIGB0ZXN0YApgYGB7cn0KbTEgPC0gbG0obWVkdiB+IC4sIGRhdGE9dGVzdCkKcHJlZHMgPC0gcHJlZGljdChtMSwgdGVzdCkKCiMgRUNNCnBhc3RlMCgnRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86ICcsIG1lYW4oKHByZWRzIC0gdGVzdCRtZWR2KSoqMikpCmBgYAoKCiMjIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIGNyb3NzLXZhbGlkYXRpb24KIyMjIyAxLiBNZXpjbGFtb3MgbG9zIGNhc29zCmBgYHtyfQojIFNodWZmbGUgZGUgY2Fzb3MKc2h1ZmYgPC0gc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1ucm93KGRmKSwgcmVwbGFjZT1GQUxTRSkKZGYgPC0gZGYgJT4lCiAgICAgICAgc2xpY2Uoc2h1ZmYpCnJtKHNodWZmKQpgYGAKCiMjIyMgMi4gRGVmaW5pbW9zIGxhIGNhbnRpZGFkIGRlIGdydXBvcyBga2AgeSBnZW5lcmFtb3MgdW4gdmVjdG9yIGRlIMOtbmRpY2VzIGBpbmRleGAgcGFyYSBoYWNlciBsYSB2YWxpZGFjacOzbiBjcnV6YWRhCmBgYHtyfSAKayA8LSA1CmluZGV4IDwtIHJlcCgxOmssbGVuZ3RoLm91dD1ucm93KGRmKSkKYGBgCgojIyMjIDMuIEdlbmVyYW1vcyB1biBsb29wIGVuIGVsIHF1ZSB2YW1vcyBpdGVyYW5kbyBzb2JyZSBlbCB2ZWN0b3IgZGUgw61uZGljZXMgYGluZGV4YDsgZW4gY2FkYSBpdGVyYWNpw7NuIGRpdmlkaW1vcyBlbiB0cmFpbiB5IHRlc3QgeSBlbnRyZW5hbW9zIGVsIG1vZGVsbyBlbiBgdHJhaW5gIHkgcHJlZGVjaW1vcyBlbiBgdGVzdGAKYGBge3J9Cm1vZGVsIDwtIGxpc3QoKQpwcmVkcyA8LSBsaXN0KCkKZm9yIChpIGluIDE6ayl7CiAgICAgICAgdHJhaW4gPC0gZGYgJT4lCiAgICAgICAgICAgICAgICBmaWx0ZXIoIShpbmRleCAlaW4lIGkpKSAjIEFjw6EgaWx0cmFtb3MgbG9zIGRlbCBncnVwbyB1CiAgICAgICAgdGVzdCA8LSBkZiAlPiUKICAgICAgICAgICAgICAgIGZpbHRlcihpbmRleCAlaW4lIGkpCiAgICAgICAKICAgICAgICBtb2RlbFtbaV1dIDwtIGxtKG1lZHYgfi4gLCBkYXRhID0gdHJhaW4pCiAgICAgICAgcHJlZHNbW2ldXSA8LSBwcmVkaWN0KG1vZGVsW1tpXV0sIHRlc3QpCn0KYGBgCgojIyMjIDQuIFRlbmVtb3MgdW5hIGxpc3RhIGBwcmVkc2AgY29uIHRvZGFzIGxhcyBwcmVkaWNjaW9uZXMuIMK/Q8OzbW8gY2FsY3VsYXLDrWFuIGVsIGVycm9yIGNyb3NzIHZhbGlkYWRvIGRlbCBtb2RlbG8/CmBgYHtyfQojIyMKYGBgCgo=</div>
 
 
 

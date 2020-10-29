@@ -7,6 +7,7 @@ output: html_notebook
 Este notebook es muy cortito y simplemente quiere mostrar dos ejemplos de implementación desde cero de un train test split y de validación cruzada:
 ```{r}
 library(MASS)
+library(tidyverse)
 data(Boston)
 df <- Boston
 rm(Boston)
@@ -16,18 +17,20 @@ rm(Boston)
 ## Implementación simple de train_test split
 #### 1. Definimos el tamaño del test set 
 ```{r}
-test_size<-0.3 
+test_size <- 0.3 
 ```
 
 #### 2. Generamos un vector de índices
 ```{r}
-test_index<-sample(1:nrow(df), round(test_size*nrow(df),0))
+test_index <- sample(1:nrow(df), round(test_size*nrow(df),0))
 ```
 
 #### 3. Usamos el vector de índices `test_index` para dividir en dos el dataset
 ```{r}
-test<-df[test_index,]
-train<-df[-test_index,]
+test <- df %>%
+        slice(test_index)
+train <- df %>%
+        slice(-test_index)
 ```
 
 #### 4. Comprobamos el tamaño
@@ -35,31 +38,49 @@ train<-df[-test_index,]
 print(nrow(test))
 print(nrow(train))
 ```
+#### 5. Podemos, entonces, entrenar una regresión en `train` y evaluarla en `test`
+```{r}
+m1 <- lm(medv ~ ., data=test)
+preds <- predict(m1, test)
+
+# ECM
+paste0('Error cuadrático medio: ', mean((preds - test$medv)**2))
+```
 
 
 ### Implementación simple de cross-validation
 #### 1. Mezclamos los casos
 ```{r}
 # Shuffle de casos
-shuff<-sample(x=1:nrow(df), size=nrow(df), replace=FALSE)
-df<-df[shuff,]
+shuff <- sample(x=1:nrow(df), size=nrow(df), replace=FALSE)
+df <- df %>%
+        slice(shuff)
 rm(shuff)
 ```
 
 #### 2. Definimos la cantidad de grupos `k` y generamos un vector de índices `index` para hacer la validación cruzada
 ```{r} 
-k<-5
-index<-rep(1:k,length.out=nrow(df))
+k <- 5
+index <- rep(1:k,length.out=nrow(df))
 ```
 
 #### 3. Generamos un loop en el que vamos iterando sobre el vector de índices `index`; en cada iteración dividimos en train y test y entrenamos el modelo en `train` y predecimos en `test`
 ```{r}
-model<-list()
-preds<-list()
+model <- list()
+preds <- list()
 for (i in 1:k){
-        train<-df[!(index %in% i),] # Acá iltramos los del grupo u
-        test<-df[index %in% i,]
-        model[[i]]<-lm(medv ~. , data = train)
-        preds[[i]]<-predict(model[[i]], test)
+        train <- df %>%
+                filter(!(index %in% i)) # Acá iltramos los del grupo u
+        test <- df %>%
+                filter(index %in% i)
+       
+        model[[i]] <- lm(medv ~. , data = train)
+        preds[[i]] <- predict(model[[i]], test)
 }
 ```
+
+#### 4. Tenemos una lista `preds` con todas las predicciones. ¿Cómo calcularían el error cross validado del modelo?
+```{r}
+###
+```
+
