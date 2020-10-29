@@ -27,7 +27,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [![](img/Download.png)](clase_1.zip)
 
 
-
 # Clase 2. 
 - [Repaso - cross validation y train test desde cero - Notebook](/clase_1/notebook/intro_train_test_cv.nb.html)
 - [Explicación y práctica guiada - Notebook](/clase_2/notebook/cart_notebook.nb.html)
