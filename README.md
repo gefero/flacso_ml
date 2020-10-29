@@ -39,7 +39,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [![](img/Download.png)](clase_2.zip)
 
 
-
 # Clase 3. 
 - [Intuición Gradient Boosting Machine - Notebook](/clase_3/notebook/boosting_intuicion_notebook.nb.html)
 - [Intuición Gradient Boosting Machine - RCode](/clase_3/scripts/boosting_intuicion_script.R)
