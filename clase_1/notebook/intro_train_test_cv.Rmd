@@ -22,7 +22,8 @@ test_size <- 0.3
 
 #### 2. Generamos un vector de índices
 ```{r}
-test_index <- sample(1:nrow(df), round(test_size*nrow(df),0))
+set.seed(10)
+test_index <- sample(x=1:nrow(df), size=round(test_size*nrow(df),0))
 ```
 
 #### 3. Usamos el vector de índices `test_index` para dividir en dos el dataset
@@ -40,7 +41,7 @@ print(nrow(train))
 ```
 #### 5. Podemos, entonces, entrenar una regresión en `train` y evaluarla en `test`
 ```{r}
-m1 <- lm(medv ~ ., data=test)
+m1 <- lm(medv ~ ., data=train)
 preds <- predict(m1, test)
 
 # ECM
@@ -61,6 +62,7 @@ rm(shuff)
 #### 2. Definimos la cantidad de grupos `k` y generamos un vector de índices `index` para hacer la validación cruzada
 ```{r} 
 k <- 5
+set.seed(12)
 index <- rep(1:k,length.out=nrow(df))
 ```
 
@@ -76,11 +78,30 @@ for (i in 1:k){
        
         model[[i]] <- lm(medv ~. , data = train)
         preds[[i]] <- predict(model[[i]], test)
+        
+        # Calcular el error de cada iteración
 }
+# Calcular el error total cros validado
 ```
 
 #### 4. Tenemos una lista `preds` con todas las predicciones. ¿Cómo calcularían el error cross validado del modelo?
 ```{r}
-###
+model <- list()
+preds <- list()
+errores <- NA # Agrego vector para recolectar los errores en cada iteración
+for (i in 1:k){
+        train <- df %>%
+                filter(!(index %in% i)) # Acá iltramos los del grupo u
+        test <- df %>%
+                filter(index %in% i)
+       
+        model[[i]] <- lm(medv ~. , data = train)
+        preds[[i]] <- predict(model[[i]], test)
+        errores[i] <- mean((preds[[i]] - test$medv)**2) # Calcular el error de cada iteración
+}
+```
+
+```{r}
+mean(errores)
 ```
 

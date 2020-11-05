@@ -1754,25 +1754,13 @@ summary {
 <p>Este notebook es muy cortito y simplemente quiere mostrar dos ejemplos de implementación desde cero de un train test split y de validación cruzada:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5cbmBgYCJ9 -->
-<pre class="r"><code>library(tidyverse)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShNQVNTKVxubGlicmFyeSh0aWR5dmVyc2UpXG5kYXRhKEJvc3RvbilcbmRmIDwtIEJvc3Rvblxucm0oQm9zdG9uKVxuYGBgIn0= -->
+<pre class="r"><code>library(MASS)
+library(tidyverse)
+data(Boston)
+df &lt;- Boston
+rm(Boston)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxuXHUwMDFiWzM3beKUgOKUgCBcdTAwMWJbMW1BdHRhY2hpbmcgcGFja2FnZXNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2UgMS4zLjAg4pSA4pSAXHUwMDFiWzM5bVxuXHUwMDFiWzM3bVx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1nZ3Bsb3QyXHUwMDFiWzM3bSAzLjMuMCAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bXB1cnJyICBcdTAwMWJbMzdtIDAuMy4zXG5cdTAwMWJbMzJt4pyTXHUwMDFiWzM3bSBcdTAwMWJbMzRtdGliYmxlIFx1MDAxYlszN20gMy4wLjAgICAgIFx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1kcGx5ciAgXHUwMDFiWzM3bSAxLjAuMlxuXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bXRpZHlyICBcdTAwMWJbMzdtIDEuMC4yICAgICBcdTAwMWJbMzJt4pyTXHUwMDFiWzM3bSBcdTAwMWJbMzRtc3RyaW5nclx1MDAxYlszN20gMS40LjBcblx1MDAxYlszMm3inJNcdTAwMWJbMzdtIFx1MDAxYlszNG1yZWFkciAgXHUwMDFiWzM3bSAxLjMuMSAgICAgXHUwMDFiWzMybeKck1x1MDAxYlszN20gXHUwMDFiWzM0bWZvcmNhdHNcdTAwMWJbMzdtIDAuNS4wXHUwMDFiWzM5bVxuXHUwMDFiWzM3beKUgOKUgCBcdTAwMWJbMW1Db25mbGljdHNcdTAwMWJbMjJtIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG5cdTAwMWJbMzFteFx1MDAxYlszN20gXHUwMDFiWzM0bWRwbHlyXHUwMDFiWzM3bTo6XHUwMDFiWzMybWZpbHRlcigpXHUwMDFiWzM3bSBtYXNrcyBcdTAwMWJbMzRtc3RhdHNcdTAwMWJbMzdtOjpmaWx0ZXIoKVxuXHUwMDFiWzMxbXhcdTAwMWJbMzdtIFx1MDAxYlszNG1kcGx5clx1MDAxYlszN206Olx1MDAxYlszMm1sYWcoKVx1MDAxYlszN20gICAgbWFza3MgXHUwMDFiWzM0bXN0YXRzXHUwMDFiWzM3bTo6bGFnKClcblx1MDAxYlszMW14XHUwMDFiWzM3bSBcdTAwMWJbMzRtZHBseXJcdTAwMWJbMzdtOjpcdTAwMWJbMzJtc2VsZWN0KClcdTAwMWJbMzdtIG1hc2tzIFx1MDAxYlszNG1NQVNTXHUwMDFiWzM3bTo6c2VsZWN0KClcdTAwMWJbMzltXG4ifQ== -->
-<pre><code>Registered S3 methods overwritten by 'dbplyr':
-  method         from
-  print.tbl_lazy     
-  print.tbl_sql      
-[37m── [1mAttaching packages[22m ────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──[39m
-[37m[32m✓[37m [34mggplot2[37m 3.3.0     [32m✓[37m [34mpurrr  [37m 0.3.3
-[32m✓[37m [34mtibble [37m 3.0.0     [32m✓[37m [34mdplyr  [37m 1.0.2
-[32m✓[37m [34mtidyr  [37m 1.0.2     [32m✓[37m [34mstringr[37m 1.4.0
-[32m✓[37m [34mreadr  [37m 1.3.1     [32m✓[37m [34mforcats[37m 0.5.0[39m
-[37m── [1mConflicts[22m ───────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-[31mx[37m [34mdplyr[37m::[32mfilter()[37m masks [34mstats[37m::filter()
-[31mx[37m [34mdplyr[37m::[32mlag()[37m    masks [34mstats[37m::lag()
-[31mx[37m [34mdplyr[37m::[32mselect()[37m masks [34mMASS[37m::select()[39m</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1782,8 +1770,8 @@ summary {
 <h4>1. Definimos el tamaño del test set</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF9zaXplPC0wLjMgXG5gYGAifQ== -->
-<pre class="r"><code>test_size&lt;-0.3 </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF9zaXplIDwtIDAuMyBcbmBgYCJ9 -->
+<pre class="r"><code>test_size &lt;- 0.3 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1792,8 +1780,9 @@ summary {
 <h4>2. Generamos un vector de índices</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdF9pbmRleCA8LSBzYW1wbGUoMTpucm93KGRmKSwgcm91bmQodGVzdF9zaXplKm5yb3coZGYpLDApKVxuYGBgIn0= -->
-<pre class="r"><code>test_index &lt;- sample(1:nrow(df), round(test_size*nrow(df),0))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMTApXG50ZXN0X2luZGV4IDwtIHNhbXBsZSh4PTE6bnJvdyhkZiksIHNpemU9cm91bmQodGVzdF9zaXplKm5yb3coZGYpLDApKVxuYGBgIn0= -->
+<pre class="r"><code>set.seed(10)
+test_index &lt;- sample(x=1:nrow(df), size=round(test_size*nrow(df),0))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1802,13 +1791,12 @@ summary {
 <h4>3. Usamos el vector de índices <code>test_index</code> para dividir en dos el dataset</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdCA8LSBkZiAlPiVcbiAgICAgICAgc2xpY2UoaW5kZXgpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdCA8LSBkZiAlPiVcbiAgICAgICAgc2xpY2UodGVzdF9pbmRleClcbnRyYWluIDwtIGRmICU+JVxuICAgICAgICBzbGljZSgtdGVzdF9pbmRleClcbmBgYCJ9 -->
 <pre class="r"><code>test &lt;- df %&gt;%
-        slice(index)</code></pre>
+        slice(test_index)
+train &lt;- df %&gt;%
+        slice(-test_index)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gfmluZGV4IDogb2JqZWN0ICdpbmRleCcgbm90IGZvdW5kXG4ifQ== -->
-<pre><code>Error in ~index : object 'index' not found</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1835,15 +1823,15 @@ summary {
 <h4>5. Podemos, entonces, entrenar una regresión en <code>train</code> y evaluarla en <code>test</code></h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubTEgPC0gbG0obWVkdiB+IC4sIGRhdGE9dGVzdClcbnByZWRzIDwtIHByZWRpY3QobTEsIHRlc3QpXG5cbiMgRUNNXG5wYXN0ZTAoJ0Vycm9yIGN1YWRyw6F0aWNvIG1lZGlvOiAnLCBtZWFuKChwcmVkcyAtIHRlc3QkbWVkdikqKjIpKVxuYGBgIn0= -->
-<pre class="r"><code>m1 &lt;- lm(medv ~ ., data=test)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubTEgPC0gbG0obWVkdiB+IC4sIGRhdGE9dHJhaW4pXG5wcmVkcyA8LSBwcmVkaWN0KG0xLCB0ZXN0KVxuXG4jIEVDTVxucGFzdGUwKCdFcnJvciBjdWFkcsOhdGljbyBtZWRpbzogJywgbWVhbigocHJlZHMgLSB0ZXN0JG1lZHYpKioyKSlcbmBgYCJ9 -->
+<pre class="r"><code>m1 &lt;- lm(medv ~ ., data=train)
 preds &lt;- predict(m1, test)
 
 # ECM
 paste0('Error cuadrático medio: ', mean((preds - test$medv)**2))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86IDIwLjMwODE2ODQxMDQ0NFwiXG4ifQ== -->
-<pre><code>[1] &quot;Error cuadrático medio: 20.308168410444&quot;</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86IDMyLjQ4NDU3OTEzMDgwNDRcIlxuIn0= -->
+<pre><code>[1] &quot;Error cuadrático medio: 32.4845791308044&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1854,10 +1842,11 @@ paste0('Error cuadrático medio: ', mean((preds - test$medv)**2))</code></pre>
 <h4>1. Mezclamos los casos</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTaHVmZmxlIGRlIGNhc29zXG5zaHVmZjwtc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1ucm93KGRmKSwgcmVwbGFjZT1GQUxTRSlcbmRmPC1kZltzaHVmZixdXG5ybShzaHVmZilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTaHVmZmxlIGRlIGNhc29zXG5zaHVmZiA8LSBzYW1wbGUoeD0xOm5yb3coZGYpLCBzaXplPW5yb3coZGYpLCByZXBsYWNlPUZBTFNFKVxuZGYgPC0gZGYgJT4lXG4gICAgICAgIHNsaWNlKHNodWZmKVxucm0oc2h1ZmYpXG5gYGAifQ== -->
 <pre class="r"><code># Shuffle de casos
-shuff&lt;-sample(x=1:nrow(df), size=nrow(df), replace=FALSE)
-df&lt;-df[shuff,]
+shuff &lt;- sample(x=1:nrow(df), size=nrow(df), replace=FALSE)
+df &lt;- df %&gt;%
+        slice(shuff)
 rm(shuff)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -1867,9 +1856,10 @@ rm(shuff)</code></pre>
 <h4>2. Definimos la cantidad de grupos <code>k</code> y generamos un vector de índices <code>index</code> para hacer la validación cruzada</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuazwtNVxuaW5kZXg8LXJlcCgxOmssbGVuZ3RoLm91dD1ucm93KGRmKSlcbmBgYCJ9 -->
-<pre class="r"><code>k&lt;-5
-index&lt;-rep(1:k,length.out=nrow(df))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuayA8LSA1XG5zZXQuc2VlZCgxMilcbmluZGV4IDwtIHJlcCgxOmssbGVuZ3RoLm91dD1ucm93KGRmKSlcbmBgYCJ9 -->
+<pre class="r"><code>k &lt;- 5
+set.seed(12)
+index &lt;- rep(1:k,length.out=nrow(df))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1910,9 +1900,32 @@ index&lt;-rep(1:k,length.out=nrow(df))</code></pre>
 <h4>4. Tenemos una lista <code>preds</code> con todas las predicciones. ¿Cómo calcularían el error cross validado del modelo?</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjXG5gYGAifQ== -->
-<pre class="r"><code>###</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWwgPC0gbGlzdCgpXG5wcmVkcyA8LSBsaXN0KClcbmVycm9yZXMgPC0gTkEgIyBBZ3JlZ28gdmVjdG9yIHBhcmEgcmVjb2xlY3RhciBsb3MgZXJyb3JlcyBlbiBjYWRhIGl0ZXJhY2nDs25cbmZvciAoaSBpbiAxOmspe1xuICAgICAgICB0cmFpbiA8LSBkZiAlPiVcbiAgICAgICAgICAgICAgICBmaWx0ZXIoIShpbmRleCAlaW4lIGkpKSAjIEFjw6EgaWx0cmFtb3MgbG9zIGRlbCBncnVwbyB1XG4gICAgICAgIHRlc3QgPC0gZGYgJT4lXG4gICAgICAgICAgICAgICAgZmlsdGVyKGluZGV4ICVpbiUgaSlcbiAgICAgICBcbiAgICAgICAgbW9kZWxbW2ldXSA8LSBsbShtZWR2IH4uICwgZGF0YSA9IHRyYWluKVxuICAgICAgICBwcmVkc1tbaV1dIDwtIHByZWRpY3QobW9kZWxbW2ldXSwgdGVzdClcbiAgICAgICAgZXJyb3Jlc1tpXSA8LSBtZWFuKChwcmVkc1tbaV1dIC0gdGVzdCRtZWR2KSoqMikgIyBDYWxjdWxhciBlbCBlcnJvciBkZSBjYWRhIGl0ZXJhY2nDs25cbn1cbmBgYCJ9 -->
+<pre class="r"><code>model &lt;- list()
+preds &lt;- list()
+errores &lt;- NA # Agrego vector para recolectar los errores en cada iteración
+for (i in 1:k){
+        train &lt;- df %&gt;%
+                filter(!(index %in% i)) # Acá iltramos los del grupo u
+        test &lt;- df %&gt;%
+                filter(index %in% i)
+       
+        model[[i]] &lt;- lm(medv ~. , data = train)
+        preds[[i]] &lt;- predict(model[[i]], test)
+        errores[i] &lt;- mean((preds[[i]] - test$medv)**2) # Calcular el error de cada iteración
+}</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihlcnJvcmVzKVxuXG5gYGAifQ== -->
+<pre class="r"><code>mean(errores)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI0LjE5NjM5XG4ifQ== -->
+<pre><code>[1] 24.19639</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -1920,7 +1933,7 @@ index&lt;-rep(1:k,length.out=nrow(df))</code></pre>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiRWplbXBsb3MgaWx1c3RyYXRpdm9zIGRlIHRyYWluLXRlc3Qgc3BsaXQgeSBjcm9zcy12YWxpZGF0aW9uIGRlc2RlIGNlcm8iCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEludHJvZHVjY2nDs24KRXN0ZSBub3RlYm9vayBlcyBtdXkgY29ydGl0byB5IHNpbXBsZW1lbnRlIHF1aWVyZSBtb3N0cmFyIGRvcyBlamVtcGxvcyBkZSBpbXBsZW1lbnRhY2nDs24gZGVzZGUgY2VybyBkZSB1biB0cmFpbiB0ZXN0IHNwbGl0IHkgZGUgdmFsaWRhY2nDs24gY3J1emFkYToKYGBge3J9CmxpYnJhcnkoTUFTUykKbGlicmFyeSh0aWR5dmVyc2UpCmRhdGEoQm9zdG9uKQpkZiA8LSBCb3N0b24Kcm0oQm9zdG9uKQpgYGAKCgojIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIHRyYWluX3Rlc3Qgc3BsaXQKIyMjIyAxLiBEZWZpbmltb3MgZWwgdGFtYcOxbyBkZWwgdGVzdCBzZXQgCmBgYHtyfQp0ZXN0X3NpemUgPC0gMC4zIApgYGAKCiMjIyMgMi4gR2VuZXJhbW9zIHVuIHZlY3RvciBkZSDDrW5kaWNlcwpgYGB7cn0KdGVzdF9pbmRleCA8LSBzYW1wbGUoMTpucm93KGRmKSwgcm91bmQodGVzdF9zaXplKm5yb3coZGYpLDApKQpgYGAKCiMjIyMgMy4gVXNhbW9zIGVsIHZlY3RvciBkZSDDrW5kaWNlcyBgdGVzdF9pbmRleGAgcGFyYSBkaXZpZGlyIGVuIGRvcyBlbCBkYXRhc2V0CmBgYHtyfQp0ZXN0IDwtIGRmICU+JQogICAgICAgIHNsaWNlKHRlc3RfaW5kZXgpCnRyYWluIDwtIGRmICU+JQogICAgICAgIHNsaWNlKC10ZXN0X2luZGV4KQpgYGAKCiMjIyMgNC4gQ29tcHJvYmFtb3MgZWwgdGFtYcOxbwpgYGB7cn0KcHJpbnQobnJvdyh0ZXN0KSkKcHJpbnQobnJvdyh0cmFpbikpCmBgYAojIyMjIDUuIFBvZGVtb3MsIGVudG9uY2VzLCBlbnRyZW5hciB1bmEgcmVncmVzacOzbiBlbiBgdHJhaW5gIHkgZXZhbHVhcmxhIGVuIGB0ZXN0YApgYGB7cn0KbTEgPC0gbG0obWVkdiB+IC4sIGRhdGE9dGVzdCkKcHJlZHMgPC0gcHJlZGljdChtMSwgdGVzdCkKCiMgRUNNCnBhc3RlMCgnRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86ICcsIG1lYW4oKHByZWRzIC0gdGVzdCRtZWR2KSoqMikpCmBgYAoKCiMjIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIGNyb3NzLXZhbGlkYXRpb24KIyMjIyAxLiBNZXpjbGFtb3MgbG9zIGNhc29zCmBgYHtyfQojIFNodWZmbGUgZGUgY2Fzb3MKc2h1ZmYgPC0gc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1ucm93KGRmKSwgcmVwbGFjZT1GQUxTRSkKZGYgPC0gZGYgJT4lCiAgICAgICAgc2xpY2Uoc2h1ZmYpCnJtKHNodWZmKQpgYGAKCiMjIyMgMi4gRGVmaW5pbW9zIGxhIGNhbnRpZGFkIGRlIGdydXBvcyBga2AgeSBnZW5lcmFtb3MgdW4gdmVjdG9yIGRlIMOtbmRpY2VzIGBpbmRleGAgcGFyYSBoYWNlciBsYSB2YWxpZGFjacOzbiBjcnV6YWRhCmBgYHtyfSAKayA8LSA1CmluZGV4IDwtIHJlcCgxOmssbGVuZ3RoLm91dD1ucm93KGRmKSkKYGBgCgojIyMjIDMuIEdlbmVyYW1vcyB1biBsb29wIGVuIGVsIHF1ZSB2YW1vcyBpdGVyYW5kbyBzb2JyZSBlbCB2ZWN0b3IgZGUgw61uZGljZXMgYGluZGV4YDsgZW4gY2FkYSBpdGVyYWNpw7NuIGRpdmlkaW1vcyBlbiB0cmFpbiB5IHRlc3QgeSBlbnRyZW5hbW9zIGVsIG1vZGVsbyBlbiBgdHJhaW5gIHkgcHJlZGVjaW1vcyBlbiBgdGVzdGAKYGBge3J9Cm1vZGVsIDwtIGxpc3QoKQpwcmVkcyA8LSBsaXN0KCkKZm9yIChpIGluIDE6ayl7CiAgICAgICAgdHJhaW4gPC0gZGYgJT4lCiAgICAgICAgICAgICAgICBmaWx0ZXIoIShpbmRleCAlaW4lIGkpKSAjIEFjw6EgaWx0cmFtb3MgbG9zIGRlbCBncnVwbyB1CiAgICAgICAgdGVzdCA8LSBkZiAlPiUKICAgICAgICAgICAgICAgIGZpbHRlcihpbmRleCAlaW4lIGkpCiAgICAgICAKICAgICAgICBtb2RlbFtbaV1dIDwtIGxtKG1lZHYgfi4gLCBkYXRhID0gdHJhaW4pCiAgICAgICAgcHJlZHNbW2ldXSA8LSBwcmVkaWN0KG1vZGVsW1tpXV0sIHRlc3QpCn0KYGBgCgojIyMjIDQuIFRlbmVtb3MgdW5hIGxpc3RhIGBwcmVkc2AgY29uIHRvZGFzIGxhcyBwcmVkaWNjaW9uZXMuIMK/Q8OzbW8gY2FsY3VsYXLDrWFuIGVsIGVycm9yIGNyb3NzIHZhbGlkYWRvIGRlbCBtb2RlbG8/CmBgYHtyfQojIyMKYGBgCgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiRWplbXBsb3MgaWx1c3RyYXRpdm9zIGRlIHRyYWluLXRlc3Qgc3BsaXQgeSBjcm9zcy12YWxpZGF0aW9uIGRlc2RlIGNlcm8iCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEludHJvZHVjY2nDs24KRXN0ZSBub3RlYm9vayBlcyBtdXkgY29ydGl0byB5IHNpbXBsZW1lbnRlIHF1aWVyZSBtb3N0cmFyIGRvcyBlamVtcGxvcyBkZSBpbXBsZW1lbnRhY2nDs24gZGVzZGUgY2VybyBkZSB1biB0cmFpbiB0ZXN0IHNwbGl0IHkgZGUgdmFsaWRhY2nDs24gY3J1emFkYToKYGBge3J9CmxpYnJhcnkoTUFTUykKbGlicmFyeSh0aWR5dmVyc2UpCmRhdGEoQm9zdG9uKQpkZiA8LSBCb3N0b24Kcm0oQm9zdG9uKQpgYGAKCgojIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIHRyYWluX3Rlc3Qgc3BsaXQKIyMjIyAxLiBEZWZpbmltb3MgZWwgdGFtYcOxbyBkZWwgdGVzdCBzZXQgCmBgYHtyfQp0ZXN0X3NpemUgPC0gMC4zIApgYGAKCiMjIyMgMi4gR2VuZXJhbW9zIHVuIHZlY3RvciBkZSDDrW5kaWNlcwpgYGB7cn0Kc2V0LnNlZWQoMTApCnRlc3RfaW5kZXggPC0gc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1yb3VuZCh0ZXN0X3NpemUqbnJvdyhkZiksMCkpCmBgYAoKIyMjIyAzLiBVc2Ftb3MgZWwgdmVjdG9yIGRlIMOtbmRpY2VzIGB0ZXN0X2luZGV4YCBwYXJhIGRpdmlkaXIgZW4gZG9zIGVsIGRhdGFzZXQKYGBge3J9CnRlc3QgPC0gZGYgJT4lCiAgICAgICAgc2xpY2UodGVzdF9pbmRleCkKdHJhaW4gPC0gZGYgJT4lCiAgICAgICAgc2xpY2UoLXRlc3RfaW5kZXgpCmBgYAoKIyMjIyA0LiBDb21wcm9iYW1vcyBlbCB0YW1hw7FvCmBgYHtyfQpwcmludChucm93KHRlc3QpKQpwcmludChucm93KHRyYWluKSkKYGBgCiMjIyMgNS4gUG9kZW1vcywgZW50b25jZXMsIGVudHJlbmFyIHVuYSByZWdyZXNpw7NuIGVuIGB0cmFpbmAgeSBldmFsdWFybGEgZW4gYHRlc3RgCmBgYHtyfQptMSA8LSBsbShtZWR2IH4gLiwgZGF0YT10cmFpbikKcHJlZHMgPC0gcHJlZGljdChtMSwgdGVzdCkKCiMgRUNNCnBhc3RlMCgnRXJyb3IgY3VhZHLDoXRpY28gbWVkaW86ICcsIG1lYW4oKHByZWRzIC0gdGVzdCRtZWR2KSoqMikpCmBgYAoKCiMjIyBJbXBsZW1lbnRhY2nDs24gc2ltcGxlIGRlIGNyb3NzLXZhbGlkYXRpb24KIyMjIyAxLiBNZXpjbGFtb3MgbG9zIGNhc29zCmBgYHtyfQojIFNodWZmbGUgZGUgY2Fzb3MKc2h1ZmYgPC0gc2FtcGxlKHg9MTpucm93KGRmKSwgc2l6ZT1ucm93KGRmKSwgcmVwbGFjZT1GQUxTRSkKZGYgPC0gZGYgJT4lCiAgICAgICAgc2xpY2Uoc2h1ZmYpCnJtKHNodWZmKQpgYGAKCiMjIyMgMi4gRGVmaW5pbW9zIGxhIGNhbnRpZGFkIGRlIGdydXBvcyBga2AgeSBnZW5lcmFtb3MgdW4gdmVjdG9yIGRlIMOtbmRpY2VzIGBpbmRleGAgcGFyYSBoYWNlciBsYSB2YWxpZGFjacOzbiBjcnV6YWRhCmBgYHtyfSAKayA8LSA1CnNldC5zZWVkKDEyKQppbmRleCA8LSByZXAoMTprLGxlbmd0aC5vdXQ9bnJvdyhkZikpCmBgYAoKIyMjIyAzLiBHZW5lcmFtb3MgdW4gbG9vcCBlbiBlbCBxdWUgdmFtb3MgaXRlcmFuZG8gc29icmUgZWwgdmVjdG9yIGRlIMOtbmRpY2VzIGBpbmRleGA7IGVuIGNhZGEgaXRlcmFjacOzbiBkaXZpZGltb3MgZW4gdHJhaW4geSB0ZXN0IHkgZW50cmVuYW1vcyBlbCBtb2RlbG8gZW4gYHRyYWluYCB5IHByZWRlY2ltb3MgZW4gYHRlc3RgCmBgYHtyfQptb2RlbCA8LSBsaXN0KCkKcHJlZHMgPC0gbGlzdCgpCmZvciAoaSBpbiAxOmspewogICAgICAgIHRyYWluIDwtIGRmICU+JQogICAgICAgICAgICAgICAgZmlsdGVyKCEoaW5kZXggJWluJSBpKSkgIyBBY8OhIGlsdHJhbW9zIGxvcyBkZWwgZ3J1cG8gdQogICAgICAgIHRlc3QgPC0gZGYgJT4lCiAgICAgICAgICAgICAgICBmaWx0ZXIoaW5kZXggJWluJSBpKQogICAgICAgCiAgICAgICAgbW9kZWxbW2ldXSA8LSBsbShtZWR2IH4uICwgZGF0YSA9IHRyYWluKQogICAgICAgIHByZWRzW1tpXV0gPC0gcHJlZGljdChtb2RlbFtbaV1dLCB0ZXN0KQogICAgICAgIAogICAgICAgICMgQ2FsY3VsYXIgZWwgZXJyb3IgZGUgY2FkYSBpdGVyYWNpw7NuCn0KIyBDYWxjdWxhciBlbCBlcnJvciB0b3RhbCBjcm9zIHZhbGlkYWRvCmBgYAoKIyMjIyA0LiBUZW5lbW9zIHVuYSBsaXN0YSBgcHJlZHNgIGNvbiB0b2RhcyBsYXMgcHJlZGljY2lvbmVzLiDCv0PDs21vIGNhbGN1bGFyw61hbiBlbCBlcnJvciBjcm9zcyB2YWxpZGFkbyBkZWwgbW9kZWxvPwpgYGB7cn0KbW9kZWwgPC0gbGlzdCgpCnByZWRzIDwtIGxpc3QoKQplcnJvcmVzIDwtIE5BICMgQWdyZWdvIHZlY3RvciBwYXJhIHJlY29sZWN0YXIgbG9zIGVycm9yZXMgZW4gY2FkYSBpdGVyYWNpw7NuCmZvciAoaSBpbiAxOmspewogICAgICAgIHRyYWluIDwtIGRmICU+JQogICAgICAgICAgICAgICAgZmlsdGVyKCEoaW5kZXggJWluJSBpKSkgIyBBY8OhIGlsdHJhbW9zIGxvcyBkZWwgZ3J1cG8gdQogICAgICAgIHRlc3QgPC0gZGYgJT4lCiAgICAgICAgICAgICAgICBmaWx0ZXIoaW5kZXggJWluJSBpKQogICAgICAgCiAgICAgICAgbW9kZWxbW2ldXSA8LSBsbShtZWR2IH4uICwgZGF0YSA9IHRyYWluKQogICAgICAgIHByZWRzW1tpXV0gPC0gcHJlZGljdChtb2RlbFtbaV1dLCB0ZXN0KQogICAgICAgIGVycm9yZXNbaV0gPC0gbWVhbigocHJlZHNbW2ldXSAtIHRlc3QkbWVkdikqKjIpICMgQ2FsY3VsYXIgZWwgZXJyb3IgZGUgY2FkYSBpdGVyYWNpw7NuCn0KYGBgCgpgYGB7cn0KbWVhbihlcnJvcmVzKQpgYGAKCg==</div>
 
 
 

@@ -8,7 +8,7 @@ output: html_notebook
 
 - Introducir los principales conceptos alrededor de la estimación de modelos basados en árboles de decisión (cart, bagging, random forest) 
 - Mostrar su implementación en `caret`
-
+        
 
 ## El problema
 
@@ -76,10 +76,12 @@ tr_index <- createDataPartition(y=df_train$imp_inglab1,
 Y generamos dos datasets
 
 ```{r}
-train <- df_train[tr_index,]
-test <- df_train[-tr_index,]
-```
+train <- df_train %>%
+        slice(tr_index)
 
+test <- df_train %>%
+        slice(-tr_index)
+```
 
 
 ## Entrenando modelos (`train()`)
@@ -102,7 +104,7 @@ cart_tune <- train(imp_inglab1 ~ . ,
                  tuneGrid = data.frame(maxdepth=3),
                  control = rpart.control(minsplit = 1,
                                          minbucket = 1,
-                                        cp=0.00000001)
+                                         cp=0.00000001)
 )
 ```
 
@@ -123,7 +125,6 @@ library(rpart.plot)
 rpart.plot(cart_tune$finalModel)
 ```
 
-
 Testeemos la performance de este árbol:
 
 ```{r}
@@ -133,7 +134,6 @@ table(predict(cart_tune, df_train) , df_train$imp_inglab1)
 ¿Qué conclusión pueden sacar al respecto?
 
 Entrenen, ahora, un segundo árbol pero más complejo: `maxdepth=10`.
-
 
 ```{r}
 cart_tune <- train(imp_inglab1 ~ . , 

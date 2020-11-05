@@ -31,8 +31,8 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [Repaso - cross validation y train test desde cero - Notebook](/clase_1/notebook/intro_train_test_cv.nb.html)
 - [Explicación y práctica guiada - Notebook](/clase_2/notebook/cart_notebook.nb.html)
 - [Explicación y práctica guiada - RCode](/clase_2/scripts/cart_script.R)
-- [Slides CART - pdf](/clase_2/slides/carts.pdf)
-- [Slides Bagging/RF - pdf](/clase_3/slides/baggging.pdf)
+- [Slides CART - pdf](/clase_2/slides/cart.pdf)
+
 
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
@@ -40,11 +40,12 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 3. 
+- [Slides Bagging/RF - pdf](/clase_3/slides/baggging.pdf)
+- [Slides Boosting - pdf](/clase_3/slides/boosting.pdf)
 - [Intuición Gradient Boosting Machine - Notebook](/clase_3/notebook/boosting_intuicion_notebook.nb.html)
 - [Intuición Gradient Boosting Machine - RCode](/clase_3/scripts/boosting_intuicion_script.R)
 - [Consignas práctica independiente - Notebook](/clase_3/notebook/practica.nb.html)
 - [Soluciones práctica independiente - Notebook](/clase_3/notebook/solution_practica.nb.html)
-- [Slides Boosting - pdf](/clase_3/slides/boosting.pdf)
 
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
