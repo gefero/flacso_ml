@@ -50,10 +50,8 @@ data <- data %>%
 Ahora, nuestra variable a predecir es el indicador `imp_inglab`. Por ende, elimonamos la $p21$.
 
 ```{r}
-
 df_train <- data %>%
         select(-p21)
-
 ```
 
 Lo primero que vamos a hacer es crear una partición de datos:
@@ -77,7 +75,7 @@ test <- df_train[-tr_index,]
 
 La idea ahora es poder entrenar un modelo random forest. Pero... lo van a hacer ustedes. Para ello, deberán consultar [la documentación de caret](http://topepo.github.io/caret/available-models.html) y buscar cuál es la mejor función para entrenar el modelo y sus hiperparámetros.
 
-Pista: buscar el método `ranger`
+Pista: buscar el método `ranger`.
 
 Usaremos la partición original entre Train-Test. Recordemos los pasos a seguir
 
@@ -98,9 +96,9 @@ cv_index_rf <- createFolds(y=train$imp_inglab1,
 fitControlrf <- trainControl(
         index=cv_index_rf,
         method="cv",
-        number=5,
-        summaryFunction = twoClassSummary,
-        classProbs=TRUE
+        number=5
+        #summaryFunction = twoClassSummary,
+        #classProbs=TRUE
         )
 
 # Generar grid
@@ -121,16 +119,16 @@ rf_fit_orig <-  train(imp_inglab1 ~ . ,
                  method = "ranger", 
                  trControl = fitControlrf,
                  tuneGrid = grid_rf,
-                 metric='ROC'
+                 #metric='ROC'
 )
 proc.time() -  t0
 
 
-saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
+#saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
 ```
 
 ```{r include=FALSE}
-rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
+#rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
 ```
 
 ```{r}
@@ -189,8 +187,7 @@ En líneas generales, existen cuatro formas generales de lidiar con el problema 
 
 ### Utilizar pesos en el modelo
 
-Para esto podemos utilizar el argumento `weights` en la función `train` -esto supone que el modelo seleccionado puede manejar pesos-...
-
+Para esto podemos utilizar el argumento `weights` en la función `train` (esto supone que el modelo seleccionado puede manejar pesos).
 
 ```{r}
 model_weights <- ifelse(train$imp_inglab1 == "non_miss",
@@ -199,7 +196,6 @@ model_weights <- ifelse(train$imp_inglab1 == "non_miss",
 
 fitControlrf$seeds <- rf_fit_orig$control$seeds
 ```
-
 
 Y entrenamos el modelo:
 
@@ -215,23 +211,18 @@ rf_fit_wei <-  train(imp_inglab1 ~ . ,
 )
 proc.time() -  t0
 
-#saveRDS(rf_fit_wei, '../models/rf_fit_wei.RDS')
-
+saveRDS(rf_fit_wei, '../models/rf_fit_wei.RDS')
 ```
 
 ```{r include=FALSE}
 rf_fit_wei <- readRDS('../models/rf_fit_wei.RDS')
 ```
 
-
 ### Métodos de remuestreo
 
 Probemos, ahora, métodos de remuestreo: _up sampling_ y _down sampling_.
-
 ```{r}
-
 # Nuevo fitControl con upsample
-
 fitControlrf_imb <- trainControl(
         index=cv_index_rf,
         method="cv",
@@ -264,7 +255,6 @@ saveRDS(rf_fit_up, '../models/rf_fit_up.RDS')
 
 ```{r include=FALSE}
 rf_fit_up <- readRDS('../models/rf_fit_up.RDS')
-
 ```
 
 
@@ -286,7 +276,7 @@ rf_fit_down <-  train(imp_inglab1 ~ . ,
 )
 proc.time() -  t0
 
-#saveRDS(rf_fit_down, '../models/rf_fit_down.RDS')
+saveRDS(rf_fit_down, '../models/rf_fit_down.RDS')
 
 ```
 

@@ -79,8 +79,12 @@ Y generamos dos datasets
 train <- df_train %>%
         slice(tr_index)
 
+#df_train[tr_index, ]
+
 test <- df_train %>%
         slice(-tr_index)
+
+#df_train[-tr_index,]
 ```
 
 
@@ -97,7 +101,7 @@ fitControl <- trainControl(method = "none", classProbs = FALSE)
 Ahora podemos entrenar un árbol poco profundo... digamos, 3. 
 
 ```{r}
-cart_tune <- train(imp_inglab1 ~ . , 
+cart_tune <- train(imp_inglab1 ~ ., 
                  data = df_train, 
                  method = "rpart2", 
                  trControl = fitControl,
@@ -128,6 +132,8 @@ rpart.plot(cart_tune$finalModel)
 Testeemos la performance de este árbol:
 
 ```{r}
+table(df_train$imp_inglab1)
+
 table(predict(cart_tune, df_train) , df_train$imp_inglab1)
 ```
 
@@ -215,7 +221,11 @@ cart_final <- train(imp_inglab1 ~ . ,
                  tuneGrid = data.frame(maxdepth=6),
                  control = rpart.control(cp=0.000001)
 )
+
+cart_final
 ```
+
+
 
 Podemos visualizarlo:
 
@@ -223,11 +233,11 @@ Podemos visualizarlo:
 rpart.plot(cart_final$finalModel)
 ```
 
-
 Y generamos las predicciones finales:
 
 ```{r}
 y_preds <- predict(cart_final, test)
+y_preds
 ```
 
 Generamos nuestra matriz de confusión:
