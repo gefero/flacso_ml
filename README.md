@@ -42,7 +42,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [Slides Bagging/RF - pdf](/clase_3/slides/bagging.pdf)
 - [Repaso flujo de trabajo](/clase_3/slides/workflow.pdf)
 
-
 # Clase 4. 
 - [Slides Boosting - pdf](/clase_3/slides/boosting.pdf)
 - [Intuición Gradient Boosting Machine - Notebook](/clase_3/notebook/boosting_intuicion_notebook.nb.html)
