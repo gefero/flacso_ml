@@ -39,9 +39,8 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 3. 
-- [Slides Bagging/RF - pdf](/clase_3/slides/baggging.pdf)
+- [Slides Bagging/RF - pdf](/clase_3/slides/bagging.pdf)
 - [Repaso flujo de trabajo](/clase_3/slides/workflow.pdf)
-- [Práctica independiente]()
 
 
 # Clase 4. 

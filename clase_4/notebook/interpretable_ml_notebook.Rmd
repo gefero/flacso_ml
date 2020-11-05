@@ -17,7 +17,6 @@ Mucho del contenido de este tutorial está basado en [Interpretable Machine Lear
 ## Interpretabilidad
 
 Hasta aquí hemos venido tratando a los modelos vistos como cajas negras. Hemos priorizado capacidad predictiva por sobre interpretabilidad. No obstante, el problema de extraer conocimiento de los modelos que hemos llamado de "caja negra" no es una cuestión trivial. 
-
 En ese sentido, si bien la performance predicitiva de un modelo es sumamente importante, no otorga la información completa sobre el problema abordado. Si bien, en muchos casos es posible que querramos apoyarnos en un modelo con mayor capacidad predictiva, en otros, también podría ser necesario entender qué nos dice dicho modelo sobre el dataset en cuestión. Entender los "por qué" del funcionamiento de un modelo, además, nos puede dar información valiosa para entender cuándo y cómo el mismo puede fallar. Los modelos de machine learning pueden tomar sesgos de los datos sobre los que se entrenan, es por ello, que la "interptretabilidad" puede ser un buen insumo para entender dichos sesgos. 
 
 

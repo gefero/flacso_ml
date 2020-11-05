@@ -1,0 +1,139 @@
+---
+title: "Repaso del flujo de trabajo"
+output: html_notebook
+---
+## Introducción
+El objetivo de estas notas es hacer un repaso de algunos de los procesos y conceptos que estuvimos trabajando hasta aquí. Particularmente, veremos la aplicación práctica de
+
+- un flujo de trabajo posible
+- tuneo de hiperpármetros
+- validación de modelos de clasificación
+
+Para ello, usaremos un dataset clásico incluido en la librería `MASS` y que es ampliamente utilizado para ilustrar y testear modelos de Machine Learning y afines.
+
+## Cargamos el dataset y los paquetes asociados
+
+```{r}
+library(caret)
+library(tidyverse)
+library(rpart)
+```
+
+```{r}
+df <- MASS::Boston %>% mutate(chas=factor(chas, labels=c('No','Si')))
+head(df)
+```
+
+Cada fila es un distrito del estado de Boston y cada variable mide diferentes atributos: 
+
+- `CRIM`: per capita crime rate by town
+- `ZN`: proportion of residential land zoned for lots over 25,000 sq.ft.
+- `INDUS`: proportion of non-retail business acres per town.
+- `CHAS`: Charles River dummy variable (1 if tract bounds river; 0 otherwise)
+- `NOX`: nitric oxides concentration (parts per 10 million)
+- `RM`: average number of rooms per dwelling
+- `AGE`: proportion of owner-occupied units built prior to 1940
+- `DIS`: weighted distances to five Boston employment centres
+- `RAD`: index of accessibility to radial highways
+- `TAX`: full-value property-tax rate per $10,000
+- `PTRATIO`: pupil-teacher ratio by town
+- `B`: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+- `LSTAT`: % lower status of the population
+- `MEDV`: Median value of owner-occupied homes in $1000's
+
+El objetivo será predecir el valor mediano de las propiedades en el condado -`MEDV`- según el resto de las varibles.
+
+
+
+A partir de ahora, les toca trabajar a ustedes
+
+## Split train-test
+
+```{r}
+set.seed(1917)
+train_index <- createDataPartition(y=df$medv,
+                                   p=0.8,
+                                   list=FALSE)
+
+train <- df %>%
+                slice(train_index)
+
+test <- df %>%
+                slice(-train_index)
+```
+
+## Proceso de entrenamiento
+### Definimos el esquema de tuneo
+```{r}
+set.seed(1945)
+cv_index <- createFolds(y = train$medv,
+                        k=5,
+                        list=TRUE,
+                        returnTrain=TRUE)
+
+set.seed(1959)
+cv_index_final <- createFolds(y = train$medv,
+                        k=5,
+                        list=TRUE,
+                        returnTrain=TRUE)
+
+trControl_tunning <- trainControl(
+                        index=cv_index_tunning, 
+                        method="cv",
+                        number=5,
+                        allowParallel=FALSE)
+
+trControl_final <- trainControl(
+                        index=cv_index_final, 
+                        method="cv",
+                        number=5,
+                        allowParallel=FALSE)
+
+```
+
+
+### Modelos elegidos
+En este ejemplo vamos a entrenar solamente dos modelos para compararlos entre sí
+
+- CART
+- Regresión logísitca
+
+### CART
+Primero, definimos la grilla de hiperparámetros (en este caso, `maxdepth`)
+```{r}
+grid <- expand.grid(maxdepth=c(1, 5,  10, 15, 20, 25))
+```
+
+Luego, realizamos el tuneo:
+```{r}
+cart_tune <- train(medv ~ . , 
+                 data = train, 
+                 method = "rpart2", 
+                 trControl = trControl_tunning,
+                 tuneGrid = grid,
+                 #control = rpart.control(minsplit = 1,
+                 #                        minbucket = 1,
+                 #                        cp=0.00000001)
+)
+```
+
+Finalmente, seleccionamos el mejor modelo:
+```{r}
+cart_final <- train(intensi ~ . , 
+                 data = train, 
+                 method = "rpart2", 
+                 tuneGrid = data.frame(maxdepth=6),
+                 #control = rpart.control(cp=0.000001)
+)
+```
+
+### Regresión logística
+La regresión logística no contiene hiperparámetros, con lo cual solamente utilizaremos 
+```{r}
+lm_fit <- train(intensi~., 
+                method='glm',
+                data=train,
+                trControl=cv_index_)
+```
+
+## Validación de los modelos
