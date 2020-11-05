@@ -33,7 +33,6 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 - [Explicación y práctica guiada - RCode](/clase_2/scripts/cart_script.R)
 - [Slides CART - pdf](/clase_2/slides/cart.pdf)
 
-
 Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
 - [![](img/Download.png)](clase_2.zip)
@@ -41,27 +40,25 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 # Clase 3. 
 - [Slides Bagging/RF - pdf](/clase_3/slides/baggging.pdf)
+- [Repaso flujo de trabajo](/clase_3/slides/workflow.pdf)
+- [Práctica independiente]()
+
+
+# Clase 4. 
 - [Slides Boosting - pdf](/clase_3/slides/boosting.pdf)
 - [Intuición Gradient Boosting Machine - Notebook](/clase_3/notebook/boosting_intuicion_notebook.nb.html)
 - [Intuición Gradient Boosting Machine - RCode](/clase_3/scripts/boosting_intuicion_script.R)
 - [Consignas práctica independiente - Notebook](/clase_3/notebook/practica.nb.html)
 - [Soluciones práctica independiente - Notebook](/clase_3/notebook/solution_practica.nb.html)
 
-Pueden descargarse la totalidad de los materiales del repositorio para trabajar en un único archivo .zip
 
-- [![](img/Download.png)](clase_3.zip)
-
-
-# Clase 4. 
+# Clase 5. Machine Learning Interpretable, repaso y cierre
 - [Explicación y práctica guiada - Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
 - [Explicación y práctica guiada - Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
 - [Interpretable ML - Notebook](/clase_4/notebook/interpretable_ml_notebook.nb.html)
 - [Interpretable ML - RCode](/clase_4/scripts/interpretable_ml_script.R)
 - [Consignas práctica independiente - Notebook](/clase_4/notebook/practica_independiente.nb.html)
 - [Soluciones práctica independiente - Notebook](/clase_4/notebook/practica_independiente_solution.nb.html)
-
-
-# Clase 5. Repaso y cierre
 
 
 
