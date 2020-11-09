@@ -9,7 +9,6 @@ output: html_notebook
 - Introducir los principales conceptos alrededor de la estimación de modelos basados en árboles de decisión (cart, bagging, random forest) 
 - Mostrar su implementación en `caret`
         
-
 ## El problema
 
 Segumos con nuestro problema central: predecir los ingresos de la ocupación principal (`p21`) en la EPH del segundo trimestre del 2015. Pero en esta oportunidad queremos evaluar si podemos predecir la no respuesta. Es decir, entrenar un modelo que nos permita predecir qué tan probable es que una persona NO responda ingresos.
@@ -48,7 +47,6 @@ data$pp07a<-factor(data$pp07a, labels=c('0-NC',
                                         '5-12 a 60 meses',
                                         '6-Más de 60 meses',
                                         '9-NS'))
-
 
 
 data <- data %>%

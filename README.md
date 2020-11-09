@@ -41,6 +41,9 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 # Clase 3. 
 - [Slides Bagging/RF - pdf](/clase_3/slides/bagging.pdf)
 - [Repaso flujo de trabajo](/clase_3/slides/workflow.pdf)
+- [Explicación y práctica guiada - Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
+- [Explicación y práctica guiada - Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
+
 
 # Clase 4. 
 - [Slides Boosting - pdf](/clase_3/slides/boosting.pdf)
@@ -51,8 +54,7 @@ Pueden descargarse la totalidad de los materiales del repositorio para trabajar 
 
 
 # Clase 5. Machine Learning Interpretable, repaso y cierre
-- [Explicación y práctica guiada - Clasificación - Notebook](/clase_3/notebook/rf_boosting_notebook.nb.html)
-- [Explicación y práctica guiada - Clasificación - RCode](/clase_3/scripts/rf_boosting_script.R)
+
 - [Interpretable ML - Notebook](/clase_4/notebook/interpretable_ml_notebook.nb.html)
 - [Interpretable ML - RCode](/clase_4/scripts/interpretable_ml_script.R)
 - [Consignas práctica independiente - Notebook](/clase_4/notebook/practica_independiente.nb.html)

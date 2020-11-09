@@ -10,17 +10,13 @@ output: html_notebook
 - Mostrar los problemas de los datasets desbalanceados y algunos métodos posibles para lidiar con el problema
 
 ## Carga de librerías y datos
-
 ```{r, message=FALSE}
 library(caret)
 library(tidyverse)
 library(rpart)
 ```
 
-
 Luego, cargamos los datos y formateamos un poco algunas etiquetas:
-
-
 ```{r}
 load('../data/EPH_2015_II.RData')
 
@@ -48,14 +44,12 @@ data <- data %>%
 ```
 
 Ahora, nuestra variable a predecir es el indicador `imp_inglab`. Por ende, elimonamos la $p21$.
-
 ```{r}
 df_train <- data %>%
         select(-p21)
 ```
 
 Lo primero que vamos a hacer es crear una partición de datos:
-
 ```{r}
 set.seed(1234)
 tr_index <- createDataPartition(y=df_train$imp_inglab1,
@@ -63,16 +57,13 @@ tr_index <- createDataPartition(y=df_train$imp_inglab1,
                                 list=FALSE)
 ```
 
-Y generamos dos datasets
-
+Y generamos dos datasets:
 ```{r}
 train <- df_train[tr_index,]
 test <- df_train[-tr_index,]
 ```
 
-
 ## Random Forest
-
 La idea ahora es poder entrenar un modelo random forest. Pero... lo van a hacer ustedes. Para ello, deberán consultar [la documentación de caret](http://topepo.github.io/caret/available-models.html) y buscar cuál es la mejor función para entrenar el modelo y sus hiperparámetros.
 
 Pista: buscar el método `ranger`.
@@ -84,8 +75,6 @@ Usaremos la partición original entre Train-Test. Recordemos los pasos a seguir
 3. Tunear el modelo
 4. Seleccionar y estimar el modelo final
 5. Validar y evaluar contra test-set
-
-
 ```{r}
 set.seed(5699)
 cv_index_rf <- createFolds(y=train$imp_inglab1,
@@ -96,9 +85,9 @@ cv_index_rf <- createFolds(y=train$imp_inglab1,
 fitControlrf <- trainControl(
         index=cv_index_rf,
         method="cv",
-        number=5
-        #summaryFunction = twoClassSummary,
-        #classProbs=TRUE
+        number=5,
+        summaryFunction = twoClassSummary,
+        classProbs=TRUE
         )
 
 # Generar grid
@@ -110,8 +99,7 @@ grid_rf <- expand.grid(mtry=c(5,10,15, 25),
 
 ```
 
-
-```{r eval=FALSE, include=TRUE}
+```{r echo=TRUE}
 # Tunear
 t0 <- proc.time()
 rf_fit_orig <-  train(imp_inglab1 ~ . , 
@@ -119,16 +107,15 @@ rf_fit_orig <-  train(imp_inglab1 ~ . ,
                  method = "ranger", 
                  trControl = fitControlrf,
                  tuneGrid = grid_rf,
-                 #metric='ROC'
+                 metric='ROC'
 )
 proc.time() -  t0
 
-
-#saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
+saveRDS(rf_fit_orig, '../models/rf_fit_orig.RDS')
 ```
 
-```{r include=FALSE}
-#rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
+```{r eval=FALSE, include=FALSE}
+rf_fit_orig <- readRDS('../models/rf_fit_orig.RDS')
 ```
 
 ```{r}
@@ -152,7 +139,8 @@ Efectivamente, parte del problema de este dataset es que tenemos una variable de
 
 ```{r}
 ggplot(train) + 
-        geom_bar(aes(x=imp_inglab1))
+        geom_bar(aes(x=imp_inglab1)) +
+        theme_minimal()
 ```
 
 #### Matriz de confusión
@@ -188,7 +176,6 @@ En líneas generales, existen cuatro formas generales de lidiar con el problema 
 ### Utilizar pesos en el modelo
 
 Para esto podemos utilizar el argumento `weights` en la función `train` (esto supone que el modelo seleccionado puede manejar pesos).
-
 ```{r}
 model_weights <- ifelse(train$imp_inglab1 == "non_miss",
                         (1/table(train$imp_inglab1)[1]) * 0.5,
@@ -198,7 +185,6 @@ fitControlrf$seeds <- rf_fit_orig$control$seeds
 ```
 
 Y entrenamos el modelo:
-
 ```{r}
 t0 <- proc.time()
 rf_fit_wei <-  train(imp_inglab1 ~ . , 
@@ -217,9 +203,9 @@ saveRDS(rf_fit_wei, '../models/rf_fit_wei.RDS')
 ```{r include=FALSE}
 rf_fit_wei <- readRDS('../models/rf_fit_wei.RDS')
 ```
+        
 
 ### Métodos de remuestreo
-
 Probemos, ahora, métodos de remuestreo: _up sampling_ y _down sampling_.
 ```{r}
 # Nuevo fitControl con upsample
@@ -289,14 +275,19 @@ Comparemos todos los modelos entrenados hasta ahora. Pero ya que estamos, incorp
 
 
 ```{r}
-cart <- readRDS('../models/cart.RDS')
+cart_final <- train(imp_inglab1 ~ . , 
+                 data = train, 
+                 method = "rpart2", 
+                 tuneGrid = data.frame(maxdepth=6),
+                 control = rpart.control(cp=0.000001)
+)
 ```
 
 
 Colocamos todos los modelos en una lista:
 
 ```{r}
-model_list <- list(cart = cart,
+model_list <- list(cart = cart_final,
                    rf_original = rf_fit_orig,
                    rf_weighted = rf_fit_wei,
                    rf_down = rf_fit_down,
@@ -399,17 +390,13 @@ eval_dummy <- function(obs){
 Volvamos a armar la lista de modelos:
 
 ```{r}
-model_list <- list(cart = cart,
+model_list <- list(#cart = cart,
                    rf_original = rf_fit_orig,
                    rf_weighted = rf_fit_wei,
                    rf_down = rf_fit_down,
                    rf_up = rf_fit_up,
                    adaboost = adaboost_fit_orig)
-
-
-
 ```
-
 
 Y, finalmente, generemos una tabla que contenga todo:
 
