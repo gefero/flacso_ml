@@ -87,7 +87,8 @@ fitControlrf <- trainControl(
         method="cv",
         number=5,
         summaryFunction = twoClassSummary,
-        classProbs=TRUE
+        classProbs=TRUE,
+        allowParallel = FALSE
         )
 
 # Generar grid
@@ -363,34 +364,11 @@ adaboost_fit_orig <- readRDS('../models/adaboost_fit_orig.RDS')
 adaboost_fit_orig
 ```
 
-
-
 ## Comparando los modelos generados
 
-Ahora, generemos un modelo de benchmark: digamos, un modelo que predice solamente en función de la moda de la variable dependiente:
-
-```{r}
-dummy_pred <- function(y){
-        uniqv <- unique(y)
-        m<-uniqv[which.max(tabulate(match(y, uniqv)))]
-        return(rep.int(m, length(y)))
-}
-
-eval_dummy <- function(obs){
-        preds <- dummy_pred(obs)
-        c <- confusionMatrix(preds, obs) 
-        dummy <- c(c$overall[1], c$byClass)
-        dummy <- as.data.frame(dummy) %>% t()
-        return(dummy)
-} 
-
-```
-
-
 Volvamos a armar la lista de modelos:
-
 ```{r}
-model_list <- list(#cart = cart,
+model_list <- list(cart = cart_final,
                    rf_original = rf_fit_orig,
                    rf_weighted = rf_fit_wei,
                    rf_down = rf_fit_down,
@@ -405,7 +383,6 @@ model_metrics <- model_list %>%
         map(extract_conf_metrics, data=test, obs = test$imp_inglab1) %>%
         do.call(rbind,.) %>%
         as.data.frame() %>%
-        rbind(., eval_dummy(test$imp_inglab1)) %>%
         t()
 
 model_metrics
