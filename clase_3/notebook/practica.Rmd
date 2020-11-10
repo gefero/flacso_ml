@@ -7,20 +7,16 @@ output: html_notebook
 
 El objetivo de esta práctica es que puedan entrenar dos modelos con `caret` y compararlos. Para ello, volveremos al problema de regresión original: queremos construir un modelo que permita predecir los ingresos de la ocupación principal ($p21$) de los ocupados en la semana de referencia encuestados en el II Trimestre de 2015.
 
-Para ello, deberán entrenar una regresión lineal y un modelo de random forest y comparar sus performances:
-
+Para ello, deberán entrenar una regresión lineal y un modelo de random forest y comparar sus performances.
 
 ### Importar las librerías a utilizar
-
-```{r, message=FALSE}
+```{r}
 library(caret)
 library(tidyverse)
 library(rpart)
 ```
 
-
 ### Importar y setear los datos correctamente
-
 ```{r}
 
 load('../data/EPH_2015_II.RData')

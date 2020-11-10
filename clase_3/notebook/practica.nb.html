@@ -1752,14 +1752,15 @@ summary {
 <div id="entrenando-dos-modelos-para-predecir-ingresos" class="section level2">
 <h2>Entrenando dos modelos para predecir ingresos</h2>
 <p>El objetivo de esta práctica es que puedan entrenar dos modelos con <code>caret</code> y compararlos. Para ello, volveremos al problema de regresión original: queremos construir un modelo que permita predecir los ingresos de la ocupación principal (<span class="math inline">\(p21\)</span>) de los ocupados en la semana de referencia encuestados en el II Trimestre de 2015.</p>
-<p>Para ello, deberán entrenar una regresión lineal y un modelo de random forest y comparar sus performances:</p>
+<p>Para ello, deberán entrenar una regresión lineal y un modelo de random forest y comparar sus performances.</p>
 <div id="importar-las-librerías-a-utilizar" class="section level3">
 <h3>Importar las librerías a utilizar</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShjYXJldClcbmxpYnJhcnkodGlkeXZlcnNlKVxubGlicmFyeShycGFydClcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r library(caret) library(tidyverse) library(rpart)</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYXJldClcbmxpYnJhcnkodGlkeXZlcnNlKVxubGlicmFyeShycGFydClcbmBgYCJ9 -->
+<pre class="r"><code>library(caret)
+library(tidyverse)
+library(rpart)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1768,15 +1769,38 @@ summary {
 <h3>Importar y setear los datos correctamente</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5sb2FkKCcuLi9kYXRhL0VQSF8yMDE1X0lJLlJEYXRhJylcblxuZGF0YSRwcDAzaTwtZmFjdG9yKGRhdGEkcHAwM2ksIGxhYmVscz1jKCcxLVNJJywgJzItTm8nLCAnOS1OUycpKVxuXG5cblxuZGF0YSRpbnRlbnNpPC1mYWN0b3IoZGF0YSRpbnRlbnNpLCBsYWJlbHM9YygnMS1TdWJfZGVtJywgJzItU09fbm9fZGVtJywgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICczLU9jdXAucGxlbm8nLCAnNC1Tb2JyZW9jJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzUtTm8gdHJhYmFqbycsICc5LU5TJykpXG5cbmRhdGEkcHAwN2E8LWZhY3RvcihkYXRhJHBwMDdhLCBsYWJlbHM9YygnMC1OQycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzEtTWVub3MgZGUgdW4gbWVzJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnMi0xIGEgMyBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzMtMyBhIDYgbWVzZXMnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICc0LTYgYSAxMiBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzUtMTIgYSA2MCBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzYtTcOhcyBkZSA2MCBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzktTlMnKSlcblxuZGZfaW1wIDwtIGRhdGEgJT4lXG4gICAgICAgIGZpbHRlcihpbXBfaW5nbGFiMT09MSkgJT4lXG4gICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpXG5cbmRmX3RyYWluIDwtIGRhdGEgJT4lXG4gICAgICAgIGZpbHRlcihpbXBfaW5nbGFiMT09MCkgJT4lXG4gICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpICU+JVxuICAgICAgICBtdXRhdGUocDIxID0gY2FzZV93aGVuKFxuICAgICAgICAgICAgICAgICAgICAgICAgcDIxPT0wIH4gMTAwLFxuICAgICAgICAgICAgICAgICAgICAgICAgVFJVRSB+IHAyMSkpXG5cblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<p>load(‘../data/EPH_2015_II.RData’)</p>
-<p>data<span class="math inline">\(pp03i&lt;-factor(data\)</span>pp03i, labels=c(‘1-SI’, ‘2-No’, ‘9-NS’))</p>
-<p>data<span class="math inline">\(intensi&lt;-factor(data\)</span>intensi, labels=c(‘1-Sub_dem’, ‘2-SO_no_dem’, ‘3-Ocup.pleno’, ‘4-Sobreoc’, ‘5-No trabajo’, ‘9-NS’))</p>
-<p>data<span class="math inline">\(pp07a&lt;-factor(data\)</span>pp07a, labels=c(‘0-NC’, ‘1-Menos de un mes’, ‘2-1 a 3 meses’, ‘3-3 a 6 meses’, ‘4-6 a 12 meses’, ‘5-12 a 60 meses’, ‘6-Más de 60 meses’, ‘9-NS’))</p>
-<p>df_imp &lt;- data %&gt;% filter(imp_inglab1==1) %&gt;% select(-imp_inglab1)</p>
-<p>df_train &lt;- data %&gt;% filter(imp_inglab1==0) %&gt;% select(-imp_inglab1) %&gt;% mutate(p21 = case_when( p21==0 ~ 100, TRUE ~ p21))</p>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5sb2FkKCcuLi9kYXRhL0VQSF8yMDE1X0lJLlJEYXRhJylcblxuZGF0YSRwcDAzaTwtZmFjdG9yKGRhdGEkcHAwM2ksIGxhYmVscz1jKCcxLVNJJywgJzItTm8nLCAnOS1OUycpKVxuXG5cblxuZGF0YSRpbnRlbnNpPC1mYWN0b3IoZGF0YSRpbnRlbnNpLCBsYWJlbHM9YygnMS1TdWJfZGVtJywgJzItU09fbm9fZGVtJywgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICczLU9jdXAucGxlbm8nLCAnNC1Tb2JyZW9jJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzUtTm8gdHJhYmFqbycsICc5LU5TJykpXG5cbmRhdGEkcHAwN2E8LWZhY3RvcihkYXRhJHBwMDdhLCBsYWJlbHM9YygnMC1OQycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzEtTWVub3MgZGUgdW4gbWVzJyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnMi0xIGEgMyBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzMtMyBhIDYgbWVzZXMnLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICc0LTYgYSAxMiBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzUtMTIgYSA2MCBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzYtTcOhcyBkZSA2MCBtZXNlcycsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzktTlMnKSlcblxuZGZfaW1wIDwtIGRhdGEgJT4lXG4gICAgICAgIGZpbHRlcihpbXBfaW5nbGFiMT09MSkgJT4lXG4gICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpXG5cbmRmX3RyYWluIDwtIGRhdGEgJT4lXG4gICAgICAgIGZpbHRlcihpbXBfaW5nbGFiMT09MCkgJT4lXG4gICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpICU+JVxuICAgICAgICBtdXRhdGUocDIxID0gY2FzZV93aGVuKFxuICAgICAgICAgICAgICAgICAgICAgICAgcDIxPT0wIH4gMTAwLFxuICAgICAgICAgICAgICAgICAgICAgICAgVFJVRSB+IHAyMSkpXG5cblxuYGBgIn0= -->
+<pre class="r"><code>
+load('../data/EPH_2015_II.RData')
+
+data$pp03i&lt;-factor(data$pp03i, labels=c('1-SI', '2-No', '9-NS'))
+
+
+
+data$intensi&lt;-factor(data$intensi, labels=c('1-Sub_dem', '2-SO_no_dem', 
+                                            '3-Ocup.pleno', '4-Sobreoc',
+                                            '5-No trabajo', '9-NS'))
+
+data$pp07a&lt;-factor(data$pp07a, labels=c('0-NC',
+                                        '1-Menos de un mes',
+                                        '2-1 a 3 meses',
+                                        '3-3 a 6 meses',
+                                        '4-6 a 12 meses',
+                                        '5-12 a 60 meses',
+                                        '6-Más de 60 meses',
+                                        '9-NS'))
+
+df_imp &lt;- data %&gt;%
+        filter(imp_inglab1==1) %&gt;%
+        select(-imp_inglab1)
+
+df_train &lt;- data %&gt;%
+        filter(imp_inglab1==0) %&gt;%
+        select(-imp_inglab1) %&gt;%
+        mutate(p21 = case_when(
+                        p21==0 ~ 100,
+                        TRUE ~ p21))
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1785,17 +1809,9 @@ summary {
 <h3>Hacer un train-test split</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMTIzNClcbnRyX2luZGV4IDwtIGNyZWF0ZURhdGFQYXJ0aXRpb24oeT1kYXRhJENsYXNzLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwPTAuNyxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbGlzdD1GQUxTRSlcblxudHJhaW5fZGF0YSA8LSBkYXRhICU+JVxuICAgICAgICAgICAgICAgIHNsaWNlKHRyX2luZGV4KVxuXG50ZXN0X2RhdGEgPC0gZGF0YSAlPiVcbiAgICAgICAgICAgICAgICBzbGljZSgtdHJfaW5kZXgpXG5cbmBgYCJ9 -->
-<pre class="r"><code>set.seed(1234)
-tr_index &lt;- createDataPartition(y=data$Class,
-                                p=0.7,
-                                list=FALSE)
-
-train_data &lt;- data %&gt;%
-                slice(tr_index)
-
-test_data &lt;- data %&gt;%
-                slice(-tr_index)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -1805,12 +1821,10 @@ test_data &lt;- data %&gt;%
 <h3>Entrenar la regresión lineal</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1819,12 +1833,10 @@ test_data &lt;- data %&gt;%
 <h3>Setear la partición para el tuneo del random forest</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section-1" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1833,12 +1845,10 @@ test_data &lt;- data %&gt;%
 <h3>Generar la grilla de hiperparámetros</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section-2" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1847,12 +1857,10 @@ test_data &lt;- data %&gt;%
 <h3>Entrenar el modelo</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section-3" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1861,12 +1869,10 @@ test_data &lt;- data %&gt;%
 <h3>Realizar las predicciones en el test-set y comparar</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section-4" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1875,12 +1881,10 @@ test_data &lt;- data %&gt;%
 <h3>Comparar en un scatter_plot las predicciones de cada modelo con los valores reales</h3>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG4jIyNcblxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-</div>
-<div id="section-5" class="section level3">
-<h3></h3>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIyNcblxuYGBgIn0= -->
+<pre class="r"><code>
+###
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1888,7 +1892,7 @@ test_data &lt;- data %&gt;%
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUHLDoWN0aWNhIGluZGVwZW5kaWVudGUiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEVudHJlbmFuZG8gZG9zIG1vZGVsb3MgcGFyYSBwcmVkZWNpciBpbmdyZXNvcwoKRWwgb2JqZXRpdm8gZGUgZXN0YSBwcsOhY3RpY2EgZXMgcXVlIHB1ZWRhbiBlbnRyZW5hciBkb3MgbW9kZWxvcyBjb24gYGNhcmV0YCB5IGNvbXBhcmFybG9zLiBQYXJhIGVsbG8sIHZvbHZlcmVtb3MgYWwgcHJvYmxlbWEgZGUgcmVncmVzacOzbiBvcmlnaW5hbDogcXVlcmVtb3MgY29uc3RydWlyIHVuIG1vZGVsbyBxdWUgcGVybWl0YSBwcmVkZWNpciBsb3MgaW5ncmVzb3MgZGUgbGEgb2N1cGFjacOzbiBwcmluY2lwYWwgKCRwMjEkKSBkZSBsb3Mgb2N1cGFkb3MgZW4gbGEgc2VtYW5hIGRlIHJlZmVyZW5jaWEgZW5jdWVzdGFkb3MgZW4gZWwgSUkgVHJpbWVzdHJlIGRlIDIwMTUuCgpQYXJhIGVsbG8sIGRlYmVyw6FuIGVudHJlbmFyIHVuYSByZWdyZXNpw7NuIGxpbmVhbCB5IHVuIG1vZGVsbyBkZSByYW5kb20gZm9yZXN0IHkgY29tcGFyYXIgc3VzIHBlcmZvcm1hbmNlczoKCgojIyMgSW1wb3J0YXIgbGFzIGxpYnJlcsOtYXMgYSB1dGlsaXphcgoKYGBge3IsIG1lc3NhZ2U9RkFMU0V9CmxpYnJhcnkoY2FyZXQpCmxpYnJhcnkodGlkeXZlcnNlKQpsaWJyYXJ5KHJwYXJ0KQpgYGAKCgojIyMgSW1wb3J0YXIgeSBzZXRlYXIgbG9zIGRhdG9zIGNvcnJlY3RhbWVudGUKCmBgYHtyfQoKbG9hZCgnLi4vZGF0YS9FUEhfMjAxNV9JSS5SRGF0YScpCgpkYXRhJHBwMDNpPC1mYWN0b3IoZGF0YSRwcDAzaSwgbGFiZWxzPWMoJzEtU0knLCAnMi1ObycsICc5LU5TJykpCgoKCmRhdGEkaW50ZW5zaTwtZmFjdG9yKGRhdGEkaW50ZW5zaSwgbGFiZWxzPWMoJzEtU3ViX2RlbScsICcyLVNPX25vX2RlbScsIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICczLU9jdXAucGxlbm8nLCAnNC1Tb2JyZW9jJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnNS1ObyB0cmFiYWpvJywgJzktTlMnKSkKCmRhdGEkcHAwN2E8LWZhY3RvcihkYXRhJHBwMDdhLCBsYWJlbHM9YygnMC1OQycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnMS1NZW5vcyBkZSB1biBtZXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzItMSBhIDMgbWVzZXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzMtMyBhIDYgbWVzZXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzQtNiBhIDEyIG1lc2VzJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICc1LTEyIGEgNjAgbWVzZXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzYtTcOhcyBkZSA2MCBtZXNlcycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnOS1OUycpKQoKZGZfaW1wIDwtIGRhdGEgJT4lCiAgICAgICAgZmlsdGVyKGltcF9pbmdsYWIxPT0xKSAlPiUKICAgICAgICBzZWxlY3QoLWltcF9pbmdsYWIxKQoKZGZfdHJhaW4gPC0gZGF0YSAlPiUKICAgICAgICBmaWx0ZXIoaW1wX2luZ2xhYjE9PTApICU+JQogICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpICU+JQogICAgICAgIG11dGF0ZShwMjEgPSBjYXNlX3doZW4oCiAgICAgICAgICAgICAgICAgICAgICAgIHAyMT09MCB+IDEwMCwKICAgICAgICAgICAgICAgICAgICAgICAgVFJVRSB+IHAyMSkpCgoKYGBgCgoKCiMjIyBIYWNlciB1biB0cmFpbi10ZXN0IHNwbGl0CgpgYGB7cn0KCiMjIwoKYGBgCgoKCiMjIyBFbnRyZW5hciBsYSByZWdyZXNpw7NuIGxpbmVhbAoKYGBge3J9CgojIyMKCmBgYAoKCgojIyMgU2V0ZWFyIGxhIHBhcnRpY2nDs24gcGFyYSBlbCB0dW5lbyBkZWwgcmFuZG9tIGZvcmVzdAoKYGBge3J9CgojIyMKCmBgYAoKCgojIyMgR2VuZXJhciBsYSBncmlsbGEgZGUgaGlwZXJwYXLDoW1ldHJvcwoKYGBge3J9CgojIyMKCmBgYAoKCgojIyMgRW50cmVuYXIgZWwgbW9kZWxvCgpgYGB7cn0KCiMjIwoKYGBgCgoKCiMjIyBSZWFsaXphciBsYXMgcHJlZGljY2lvbmVzIGVuIGVsIHRlc3Qtc2V0IHkgY29tcGFyYXIKCmBgYHtyfQoKIyMjCgpgYGAKCgoKIyMjIENvbXBhcmFyIGVuIHVuIHNjYXR0ZXJfcGxvdCBsYXMgcHJlZGljY2lvbmVzIGRlIGNhZGEgbW9kZWxvIGNvbiBsb3MgdmFsb3JlcyByZWFsZXMKCmBgYHtyfQoKIyMjCgpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUHLDoWN0aWNhIGluZGVwZW5kaWVudGUiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIEVudHJlbmFuZG8gZG9zIG1vZGVsb3MgcGFyYSBwcmVkZWNpciBpbmdyZXNvcwoKRWwgb2JqZXRpdm8gZGUgZXN0YSBwcsOhY3RpY2EgZXMgcXVlIHB1ZWRhbiBlbnRyZW5hciBkb3MgbW9kZWxvcyBjb24gYGNhcmV0YCB5IGNvbXBhcmFybG9zLiBQYXJhIGVsbG8sIHZvbHZlcmVtb3MgYWwgcHJvYmxlbWEgZGUgcmVncmVzacOzbiBvcmlnaW5hbDogcXVlcmVtb3MgY29uc3RydWlyIHVuIG1vZGVsbyBxdWUgcGVybWl0YSBwcmVkZWNpciBsb3MgaW5ncmVzb3MgZGUgbGEgb2N1cGFjacOzbiBwcmluY2lwYWwgKCRwMjEkKSBkZSBsb3Mgb2N1cGFkb3MgZW4gbGEgc2VtYW5hIGRlIHJlZmVyZW5jaWEgZW5jdWVzdGFkb3MgZW4gZWwgSUkgVHJpbWVzdHJlIGRlIDIwMTUuCgpQYXJhIGVsbG8sIGRlYmVyw6FuIGVudHJlbmFyIHVuYSByZWdyZXNpw7NuIGxpbmVhbCB5IHVuIG1vZGVsbyBkZSByYW5kb20gZm9yZXN0IHkgY29tcGFyYXIgc3VzIHBlcmZvcm1hbmNlcy4KCiMjIyBJbXBvcnRhciBsYXMgbGlicmVyw61hcyBhIHV0aWxpemFyCmBgYHtyfQpsaWJyYXJ5KGNhcmV0KQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShycGFydCkKYGBgCgojIyMgSW1wb3J0YXIgeSBzZXRlYXIgbG9zIGRhdG9zIGNvcnJlY3RhbWVudGUKYGBge3J9Cgpsb2FkKCcuLi9kYXRhL0VQSF8yMDE1X0lJLlJEYXRhJykKCmRhdGEkcHAwM2k8LWZhY3RvcihkYXRhJHBwMDNpLCBsYWJlbHM9YygnMS1TSScsICcyLU5vJywgJzktTlMnKSkKCgoKZGF0YSRpbnRlbnNpPC1mYWN0b3IoZGF0YSRpbnRlbnNpLCBsYWJlbHM9YygnMS1TdWJfZGVtJywgJzItU09fbm9fZGVtJywgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzMtT2N1cC5wbGVubycsICc0LVNvYnJlb2MnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICc1LU5vIHRyYWJham8nLCAnOS1OUycpKQoKZGF0YSRwcDA3YTwtZmFjdG9yKGRhdGEkcHAwN2EsIGxhYmVscz1jKCcwLU5DJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICcxLU1lbm9zIGRlIHVuIG1lcycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnMi0xIGEgMyBtZXNlcycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnMy0zIGEgNiBtZXNlcycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnNC02IGEgMTIgbWVzZXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJzUtMTIgYSA2MCBtZXNlcycsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAnNi1Nw6FzIGRlIDYwIG1lc2VzJywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICc5LU5TJykpCgpkZl9pbXAgPC0gZGF0YSAlPiUKICAgICAgICBmaWx0ZXIoaW1wX2luZ2xhYjE9PTEpICU+JQogICAgICAgIHNlbGVjdCgtaW1wX2luZ2xhYjEpCgpkZl90cmFpbiA8LSBkYXRhICU+JQogICAgICAgIGZpbHRlcihpbXBfaW5nbGFiMT09MCkgJT4lCiAgICAgICAgc2VsZWN0KC1pbXBfaW5nbGFiMSkgJT4lCiAgICAgICAgbXV0YXRlKHAyMSA9IGNhc2Vfd2hlbigKICAgICAgICAgICAgICAgICAgICAgICAgcDIxPT0wIH4gMTAwLAogICAgICAgICAgICAgICAgICAgICAgICBUUlVFIH4gcDIxKSkKCgpgYGAKCgoKIyMjIEhhY2VyIHVuIHRyYWluLXRlc3Qgc3BsaXQKCmBgYHtyfQoKIyMjCgpgYGAKCgoKIyMjIEVudHJlbmFyIGxhIHJlZ3Jlc2nDs24gbGluZWFsCgpgYGB7cn0KCiMjIwoKYGBgCgoKCiMjIyBTZXRlYXIgbGEgcGFydGljacOzbiBwYXJhIGVsIHR1bmVvIGRlbCByYW5kb20gZm9yZXN0CgpgYGB7cn0KCiMjIwoKYGBgCgoKCiMjIyBHZW5lcmFyIGxhIGdyaWxsYSBkZSBoaXBlcnBhcsOhbWV0cm9zCgpgYGB7cn0KCiMjIwoKYGBgCgoKCiMjIyBFbnRyZW5hciBlbCBtb2RlbG8KCmBgYHtyfQoKIyMjCgpgYGAKCgoKIyMjIFJlYWxpemFyIGxhcyBwcmVkaWNjaW9uZXMgZW4gZWwgdGVzdC1zZXQgeSBjb21wYXJhcgoKYGBge3J9CgojIyMKCmBgYAoKCgojIyMgQ29tcGFyYXIgZW4gdW4gc2NhdHRlcl9wbG90IGxhcyBwcmVkaWNjaW9uZXMgZGUgY2FkYSBtb2RlbG8gY29uIGxvcyB2YWxvcmVzIHJlYWxlcwoKYGBge3J9CgojIyMKCmBgYAoK</div>
 
 
 
