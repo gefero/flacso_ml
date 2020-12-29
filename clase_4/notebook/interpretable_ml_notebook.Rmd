@@ -20,7 +20,7 @@ En ese sentido, si bien la performance predictiva de un modelo es sumamente impo
 En líneas generales, podemos pensar que existen modelos qué son interpretables intrínsecamente: una regresión lineal, un árbol de decisión son métodos que no requieren de aproximaciones complicadas para entender qué nos dicen sobre un problema. En estos casos, los parámetros del modelo o ciertos estadísticos resumen suelen ser suficientes para extraer la información que nos brindan.
 
 En algunos casos, existen _herramientas de interpretación específicas_: se limitan a clases de modelo específicas. La interpretación de los pesos de regresión en un modelo lineal es una interpretación específica del modelo, ya que, por definición, la interpretación de modelos intrínsecamente interpretables siempre es específica del modelo. Las redes neuronales son específicas del modelo. 
-
+                
 Las herramientas _agnósticas de modelo_ se pueden usar en cualquier modelo de aprendizaje automático y se aplican después de que el modelo haya sido entrenado (post hoc). Estos métodos agnósticos generalmente funcionan analizando los pares de entrada y salida de características. Por definición, estos métodos no pueden tener acceso a los componentes internos del modelo, como los pesos o la información estructural.
 
 ## Carga de librerías y datos

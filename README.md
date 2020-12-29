@@ -2,6 +2,11 @@
 
 # [Germán Rosati](gefero.github.io)
 
+# TP Final (consignas y datos)
+- [Consignas](/tp_final/consignas.pdf)
+- [Dataset](/tp_final/data/deptos_2014.csv)
+- [Documento dataset](/tp_final/data/descripcion_data.pdf)
+
 # Presentación
 El objetivo de este curso es brindar una primera aproximación a algunos conceptos fundamentales de Machine Learning: hiperparámetros, sesgo-varianza, flujo de trabajo, error de generalización, serán algunos de los conceptos a trabajar.
 

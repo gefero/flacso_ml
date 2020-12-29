@@ -110,17 +110,14 @@ grid_rf <- expand.grid(mtry=c(21),
 
 
 ### Entrenar el modelo
-
-
-
-
 ```{r}
 t0<-proc.time()
-rf_fit_regresion <- train(p21 ~ ., data = train, 
-                 method = "ranger", 
-                 trControl = fitControl,
-                 tuneGrid = grid_rf,
-                 verbose = FALSE)
+rf_fit_regresion <- train(p21 ~ ., 
+                          data = train, 
+                          method = "ranger", 
+                          trControl = fitControl,
+                          tuneGrid = grid_rf,
+                          verbose = FALSE)
 proc.time() - t0
 
 saveRDS(rf_fit_regresion, '../models/rf_fit_regresion.RDS')
